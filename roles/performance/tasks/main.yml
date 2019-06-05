@@ -1,0 +1,19 @@
+---
+
+- include_vars: group_vars/general_definitions
+
+#- name: Validar a existencia de jarsToSkip no ficheiro catalina.properties
+#  shell: grep -c catalina.properties /opt/tomcat/conf/catalina.properties
+#  register: 
+
+- name: Aplicar template já com os JARs habituais a ignorar
+  template:
+    src: catalina.properties
+    dest: /opt/tomcat/conf/
+    backup: yes
+  notify: restart tomcat
+
+#- name: Listar JARs a ignorar
+#  shell: ls /opt/shibboleth-idp/webapp/WEB-INF/lib | awk '{print $1",\\"}'
+#  register: list_jars_ignorar#
+#- debug: var=list_jars_ignorar.stdout

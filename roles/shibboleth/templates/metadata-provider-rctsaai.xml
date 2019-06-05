@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MetadataProvider id="RCTSaaiMD" xsi:type="FileBackedHTTPMetadataProvider"
+    xmlns="urn:mace:shibboleth:2.0:metadata"
+    xmlns:resource="urn:mace:shibboleth:2.0:resource"
+    xmlns:security="urn:mace:shibboleth:2.0:security"
+    xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        backingFile="%{idp.home}/metadata/metadata.rctsaai.xml"
+    metadataURL="https://rctsaai-rr.fccn.pt/rr/signedmetadata/federation/UkNUU2FhaQ~~/metadata.xml"
+        requireValidMetadata="true"
+    maxRefreshDelay="PT1H"
+    xsi:schemaLocation="urn:mace:shibboleth:2.0:metadata http://shibboleth.net/schema/idp/shibboleth-metadata.xsd
+                        urn:mace:shibboleth:2.0:resource http://shibboleth.net/schema/idp/shibboleth-resource.xsd 
+                        urn:mace:shibboleth:2.0:security http://shibboleth.net/schema/idp/shibboleth-security.xsd
+                        urn:oasis:names:tc:SAML:2.0:metadata http://docs.oasis-open.org/security/saml/v2.0/saml-schema-metadata-2.0.xsd">
+       
+        <MetadataFilter xsi:type="SignatureValidation" certificateFile="%{idp.home}/credentials/metadatasigner.pem" />
+        <MetadataFilter xsi:type="RequiredValidUntil" maxValidityInterval="P7D"/>
+        <MetadataFilter xsi:type="EntityRoleWhiteList">
+            <RetainedRole>md:SPSSODescriptor</RetainedRole>
+        </MetadataFilter>
+</MetadataProvider>

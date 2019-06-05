@@ -1,0 +1,68 @@
+#
+# Configurações Apache
+######################
+organization_domain: fccn.pt
+server_name: idp.fccn.pt
+server_admin: idp-admin@fccn.pt
+
+#
+# Certificados digitais
+#######################
+path_ssl_cert_key_file: /etc/pki/tls/private/XXXXXXXX.key
+path_ssl_cert_file: /etc/pki/tls/certs/idp/XXXXXXXXXXX.crt
+path_ssl_cert_chain_file: /etc/pki/tls/certs/idp/DigiCertCA.crt
+
+#
+# Configurações CC_CMD
+######################
+keystore_password: XXXXXXXXXXX
+keystore_location: /etc/pki/ca-trust/extracted/java/XXXXXXXX
+keystore_alias: idpfccn
+external_issuer: idp.fccn.pt
+external_ama: https://autenticacao.gov.pt/fa/Default.aspx
+external_provider_name: FundaÃ§ para a CiÃªia e a Tecnologia
+
+#
+#p12 CC_CMD
+path_ssl_cc_cert_key_file: /tmp/certs/XXXXXXXX.key
+path_ssl_cc_cert_file: /tmp/certs/XXXXXXXX.crt
+path_ssl_cc_cert_chain_file: /tmp/certs/DigiCertCA.crt
+
+
+#
+# Configurações de Base de Dados
+postgresql_backup_dest: /var/lib/pgsql/backups
+
+#
+# Configurações Tomcat
+######################
+#tomcat_version: 8.5.38
+tomcat_version: 9.0.16
+tomcat_xms: 512M
+tomcat_xmx: 3072M
+
+#
+# Configurações Shibboleth
+##########################
+ip_range_access_control: '0.0.0.0/0'  # Tem de estar obrigatoriamente entre 'plicas'
+idp_metadata: rctsaai,rctsaai-engine,interfederation                 # No caso de testes aaitest, caso de produção rctsaai
+ldap_url: XXXXXXXX              # Pode ser o endereco IP ou o FQDN do servidor da AD ou LDAP server
+ldap_dn_format: dc=corp,dc=fccn,dc=pt
+ldap_port: XXXXXXXX               # Porto de ligação à AD ou LDAP (standart 389)
+ldap_username: XXXXXXXX
+ldap_password: XXXXXXXX
+ldap_type: sAMAccountName             # No caso de AD sAMAccountName, no caso de LDAP uid
+
+#
+# Configurações Recaptcha
+##########################
+recaptcha_key: XXXXXXXXXXX
+
+IDP_VERSION: 3.4.3
+source_directory: /usr/local/dist/shibboleth-identity-provider-3.4.3
+installation_directory: /opt/shibboleth-idp
+hostname: idp.fccn.pt
+SAML_entityID: https://idp.fccn.pt/idp/shibboleth
+attribute_scope:  fccn.pt
+backchannel_PKCS12_password: password
+cookie_Encryption_key_password: password

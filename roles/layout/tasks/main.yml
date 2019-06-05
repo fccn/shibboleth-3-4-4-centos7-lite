@@ -1,0 +1,101 @@
+---
+
+- include_vars: group_vars/general_definitions
+
+- name: Actualizar index.jsp
+  template:
+    src: index.jsp
+    dest: /opt/shibboleth-idp/edit-webapp/
+    backup: yes
+
+- name: Copiar terms-of-use.vm
+  template:
+    src: terms-of-use.vm
+    dest: /opt/shibboleth-idp/views/intercept/
+    backup: yes
+
+- name: Copiar attribute-release.vm
+  template:
+    src: attribute-release.vm
+    dest: /opt/shibboleth-idp/views/intercept/
+    backup: yes
+
+- name: Copiar error.vm
+  copy:
+    src: "{{ role_path }}/files/error.vm"
+    dest: /opt/shibboleth-idp/views/
+    backup: yes
+
+- name: Copiar login.vm
+  template:
+    src: "{{ role_path }}/files/login.vm"
+    dest: /opt/shibboleth-idp/views/
+    backup: yes
+
+- name: Copiar login-error.vm
+  copy:
+    src: "{{ role_path }}/files/login-error.vm"
+    dest: /opt/shibboleth-idp/views/
+    backup: yes
+
+- name: Copiar authn-messages.properties
+  template:
+    src: "{{ role_path }}/files/authn-messages.properties"
+    dest: /opt/shibboleth-idp/messages/
+    backup: yes
+
+- name: Copiar authn-messages_pt_PT.properties
+  template:
+    src: "{{ role_path }}/files/authn-messages_pt_PT.properties"
+    dest: /opt/shibboleth-idp/messages/
+    backup: yes
+
+- name: Copiar consent-messages.properties
+  copy:
+    src: "{{ role_path }}/files/consent-messages.properties"
+    dest: /opt/shibboleth-idp/messages/
+    backup: yes
+
+- name: Copiar consent-messages_pt_PT.properties
+  copy:
+    src: "{{ role_path }}/files/consent-messages_pt_PT.properties"
+    dest: /opt/shibboleth-idp/messages/
+    backup: yes
+
+- name: Copiar error-messages.properties
+  template:
+    src: error-messages.properties
+    dest: /opt/shibboleth-idp/messages/
+    backup: yes
+
+- name: Copiar error-messages_pt_PT.properties
+  template:
+    src: error-messages_pt_PT.properties
+    dest: /opt/shibboleth-idp/messages/
+    backup: yes
+
+- name: Copiar pacote FCCN 
+  unarchive:
+    src: "{{ role_path }}/files/FCCN.zip"
+    dest: /opt/shibboleth-idp/edit-webapp/
+
+#- name: Adicionar código ao bean existente mvc-beans.xml
+#  lineinfile: dest=/opt/shibboleth-idp/conf/mvc-beans.xml
+#              state=present
+#              insertbefore='</beans>'
+#              line='\n    <mvc:interceptors>\n           <bean id="localeChangeInterceptor" class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">\n                    <property name="paramName" value="lang"/>\n           </bean>\n    </mvc:interceptors>\n    <bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver">\n           <property name="defaultLocale" value=""/>\n    </bean>\n'
+
+- name: Adicionar código ao bean existente mvc-beans.xml
+  template:
+    src: mvc-beans.xml
+    dest: /opt/shibboleth-idp/conf/
+
+- name: Copiar service worker 
+  copy:
+    src: "{{ role_path }}/files/sw.js"
+    dest: /opt/shibboleth-idp/edit-webapp/
+
+- name: Recriar o arquivo idp.war
+  shell: JAVACMD=/usr/bin/java /opt/shibboleth-idp/bin/build.sh -Didp.target.dir=/opt/shibboleth-idp
+  register: shell_output
+  notify: restart tomcat

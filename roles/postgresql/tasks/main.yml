@@ -1,0 +1,123 @@
+---
+
+- include_vars: group_vars/general_definitions
+
+- name: A installar pacote de PostgreSQL
+  yum: pkg={{ item }}
+  with_items:
+  - postgresql-server
+  - postgresql-jdbc
+  - python-psycopg2
+
+- name: Garantir que o Postgresql arranca no boot da máquina
+  systemd:
+    name: postgresql
+    enabled: yes
+    masked: no
+
+#- name: Validar se postgres já foi inciado
+#  shell: "ls -la /var/lib/pgsql/data/ | grep pg_ | wc -l"
+#  register: postgresql_iniciated
+
+- name: Validar se postgres já foi inciado
+  stat: path=/var/lib/pgsql/data
+  register: postgresql_iniciated
+
+- debug: var=postgresql_iniciated.stat.exists
+
+# So tenta recriar a base de dados PostgreSQL no caso de nao ter sido criado
+- name: Iniciar base de dados do PostgreSQL
+  shell: /usr/bin/postgresql-setup initdb
+  when: postgresql_iniciated.stat.exists
+
+- name: Restart PostgreSQL
+  systemd:
+    name: postgresql.service
+    state: restarted
+
+- name: Copy postgres script
+  template:
+    src: db_criation.sql
+    dest: /var/lib/pgsql/db_criation.sql
+    owner: postgres
+    group: postgres
+    mode: 0664
+
+- name: Arrancar PostgreSQL
+  systemd:
+    name: postgresql.service
+    state: restarted
+
+- name: Executar script de criacao da base de dados e propriedades
+  become: true
+  become_method: sudo
+  become_user: postgres
+  shell: psql < /var/lib/pgsql/db_criation.sql
+
+- lineinfile:
+    path: /var/lib/pgsql/data/postgresql.conf
+    regexp: '^[#]*autovacuum_vacuum_scale_factor'
+    line: 'autovacuum_vacuum_scale_factor = 0.002  # fraction of table size before vacuum'
+
+- lineinfile:
+    path: /var/lib/pgsql/data/postgresql.conf
+    regexp: '^[#]*autovacuum_analyze_scale_factor'
+    line: 'autovacuum_analyze_scale_factor = 0.002 # fraction of table size before vacuum'
+
+- name: Reload do PostgreSQL
+  systemd:
+    name: postgresql.service
+    state: reloaded
+
+- name: Configurar ligações locais
+  lineinfile:
+    dest: /var/lib/pgsql/data/pg_hba.conf
+    state: present
+    insertbefore: 'local   all             all                                     peer'
+    line: 'local   all             postgres                                trust'
+
+- lineinfile:
+    path: /var/lib/pgsql/data/pg_hba.conf
+    regexp: 'local   all             all                                     peer'
+    line: 'local   all             all                                     md5'
+
+- name: Alterar regras de acesso externo por IPv4 no PostgreSQL
+  lineinfile:
+    path: /var/lib/pgsql/data/pg_hba.conf
+    regexp: '^host    all             all             127.0.0.1/32            ident'
+    line: 'host    all             all             127.0.0.1/32            md5'
+
+- name: Alterar regras de acesso externo por IPv6 no PostgreSQL
+  lineinfile:
+    path: /var/lib/pgsql/data/pg_hba.conf
+    regexp: '^host    all             all             ::1/128                 ident'
+    line: 'host    all             all             ::1/128                 md5'
+
+- name: Configurar backups diarios
+  template:
+    src: postgres-backup
+    dest: /etc/cron.d/
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Validar existencia da pastas destino dos backups
+  stat: path="{{ postgresql_backup_dest }}"
+  register: pgsql_backup_path
+
+#- debug: var=pgsql_backup_path
+
+- name: Criar pasta de backups no caso estar em falta
+  file:
+    path: "{{ postgresql_backup_dest }}"
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: 0760
+    recurse: yes
+  when: pgsql_backup_path.stat.exists == false
+
+# Não pode ser efetuado o restart to postgres com as novas
+# configurações de acesso até ser instalado o Shibboleth
+# O restart do Postgresql será feito na role do Shibboleth
+

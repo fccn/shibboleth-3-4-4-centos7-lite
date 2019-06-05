@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"
+
+       default-init-method="initialize"
+       default-destroy-method="destroy">
+
+    <!--
+    Unverified RP configuration, defaults to no support for any profiles. Add <ref> elements to the list
+    to enable specific default profile settings (as below), or create new beans inline to override defaults.
+
+    "Unverified" typically means the IdP has no metadata, or equivalent way of assuring the identity and
+    legitimacy of a requesting system. To run an "open" IdP, you can enable profiles here.
+    -->
+    <bean id="shibboleth.UnverifiedRelyingParty" parent="RelyingParty">
+        <property name="profileConfigurations">
+            <list>
+            <!-- <bean parent="SAML2.SSO" p:encryptAssertions="false" /> -->
+            </list>
+        </property>
+    </bean>
+
+    <!--
+    Default configuration, with default settings applied for all profiles, and enables
+    the attribute-release consent flow.
+    -->
+    <bean id="shibboleth.DefaultRelyingParty" parent="RelyingParty">
+        <property name="profileConfigurations">
+            <list>
+                <bean parent="Shibboleth.SSO" p:postAuthenticationFlows="#{ {'terms-of-use', 'attribute-release'} }"  />
+                <ref bean="SAML1.AttributeQuery" />
+                <ref bean="SAML1.ArtifactResolution" />
+                <bean parent="SAML2.SSO" p:postAuthenticationFlows="#{ {'terms-of-use', 'attribute-release'} }"  />
+                <ref bean="SAML2.ECP" />
+                <ref bean="SAML2.Logout" />
+                <ref bean="SAML2.AttributeQuery" />
+                <ref bean="SAML2.ArtifactResolution" />
+            </list>
+        </property>
+    </bean>
+
+
+   <bean id="SHA1SecurityConfig" parent="shibboleth.DefaultSecurityConfiguration" p:signatureSigningConfiguration-ref="shibboleth.SigningConfiguration.SHA1" />
+
+    <!-- Container for any overrides you want to add. -->
+    <util:list id="shibboleth.RelyingPartyOverrides">
+
+        <!--
+        For further documentation, see
+        https://wiki.shibboleth.net/confluence/display/IDP30/RelyingPartyConfiguration#RelyingPartyConfiguration-Overrides
+        Note that specific rules must come before more generic ones, as the
+        overrides are applied on a "first one wins" basis.
+        -->
+        <bean parent="RelyingPartyByName" c:relyingPartyIds="https://myservices.rcts.pt">
+            <property name="profileConfigurations">
+                <list>
+                    <bean parent="SAML2.SSO"  p:postAuthenticationFlows="#{ {'terms-of-use', 'attribute-release'} }" p:securityConfiguration-ref="SHA1SecurityConfig" />
+                </list>
+            </property>
+        </bean>
+
+
+        <!--
+        Override example that identifies a single RP by name and configures it
+        for SAML 2 SSO without encryption. This is a common "vendor" scenario.
+        -->
+        <!--
+        <bean parent="RelyingPartyByName" c:relyingPartyIds="https://sp.example.org">
+            <property name="profileConfigurations">
+                <list>
+                    <bean parent="SAML2.SSO" p:encryptAssertions="false" />
+                </list>
+            </property>
+        </bean>
+        <bean parent="RelyingPartyByName" c:relyingPartyIds="#{{'https://a.example.com/shibboleth', 'https://b.example.com/shibboleth'}}">
+            <property name="profileConfigurations">
+                <list>
+                    <bean parent="SAML2.SSO.custom" p:signAssertions="false" />
+                </list>
+            </property>
+        </bean>
+
+        <bean parent="RelyingPartyByName" c:relyingPartyIds="#{{'https://x.example.com/shibboleth', 'https://y.example.com/shibboleth'}}">
+            <property name="profileConfigurations">
+                <list>
+                    <bean parent="Shibboleth.SSO.custom"
+                          p:signAssertions="true"
+                          p:signResponses="false" />
+                    <bean parent="SAML2.SSO.custom"
+                          p:signAssertions="true"
+                          p:signResponses="false" />
+                </list>
+            </property>
+        </bean>
+        -->
+
+
+        <!--
+        Suppressing the user consent dialog for "trusted" SPs
+
+        When enabled, the following bean / relying party override
+        allows turning off the user consent dialog (formerly known as
+        "uApprove") for service providers operated by specific home
+        organizations and/or types of home organizations. This option
+        is provided for backwards compatibility with uApprove's
+        services/services.blacklist settings, for sites wishing
+        to retain the existing behavior. In general, SWITCH recommends
+        using the new IdP v3 default settings, i.e. enabling user consent
+        for all SPs.
+
+        To adapt for your environment, determine what "disable..." bean(s)
+        below apply to your environment, and fill in the "p:values" and/or
+        "p:regexps" attributes accordingly:
+
+        - disableForSingleHomeOrganization will turn off user consent for
+          the SPs of one specific home organization only (your own, typically).
+
+        - disableForMultipleHomeOrganizations will turn off user consent for
+          the SPs of multiple, individually named organizations. The regular
+          expression doesn't need to be anchored (enclosed with '^...$'),
+          as this happens automatically when the IdP performs the matching.
+
+        - disableForSingleHomeOrganizationType will turn off user consent for
+          the SPs of one specific category of home organization (e.g. "university").
+
+        - disableForMultipleHomeOrganizationTypes will turn off user consent for
+          the SPs of multiple types of home organizations. The regular
+          expression doesn't need to be anchored (enclosed with '^...$'),
+          as this happens automatically when the IdP performs the matching.
+
+        The beans are applied as OR conditions when an SP entry is processed,
+        i.e.  the "candidates" list may include one or more beans, though
+        usually not more than two will be needed.
+
+        Values for use with the "disableForSingleHomeOrganization" or
+        "disableForMultipleHomeOrganizations" beans can be found under
+        https://www.switch.ch/aai/participants/allhomeorgs-expert/
+        ("urn:oid:2.16.756.1.2.5.1.1.4" denotes swissEduPersonHomeOrganization).
+
+        Values for use with the "disableForSingleHomeOrganizationType" or
+        "disableForMultipleHomeOrganizationTypes" can be found under
+        https://www.switch.ch/aai/support/documents/attributes/swissedupersonhomeorganizationtype/
+        ("urn:oid:2.16.756.1.2.5.1.1.5" denotes swissEduPersonHomeOrganizationType).
+
+        Note that these values relate to the home organization and its type,
+        i.e. the SP is identified based on its assignment to a particular home
+        organization (and implicitly its type) in the AAI Resource Registry.
+        -->
+
+        <!--
+        <bean id="shibboleth.NoUserConsentRelyingParty" parent="RelyingPartyByTag">
+            <constructor-arg name="candidates">
+                <list>
+                    <bean id="disableForSingleHomeOrganization" parent="TagCandidate"
+                          c:name="urn:oid:2.16.756.1.2.5.1.1.4"
+                          p:values="example.org" />
+
+                    <bean id="disableForMultipleHomeOrganizations" parent="TagCandidate"
+                          c:name="urn:oid:2.16.756.1.2.5.1.1.4"
+                          p:regexps="example\.org|example\.net" />
+
+                    <bean id="disableForSingleHomeOrganizationType" parent="TagCandidate"
+                          c:name="urn:oid:2.16.756.1.2.5.1.1.5"
+                          p:values="university" />
+
+                    <bean id="disableForMultipleHomeOrganizationTypes" parent="TagCandidate"
+                          c:name="urn:oid:2.16.756.1.2.5.1.1.5"
+                          p:regexps="university|uas" />
+                </list>
+            </constructor-arg>
+            <property name="profileConfigurations">
+                <list>
+                    <ref bean="Shibboleth.SSO" />
+                    <ref bean="SAML1.AttributeQuery" />
+                    <ref bean="SAML1.ArtifactResolution" />
+                    <ref bean="SAML2.SSO" />
+                    <ref bean="SAML2.ECP" />
+                    <ref bean="SAML2.Logout" />
+                    <ref bean="SAML2.AttributeQuery" />
+                    <ref bean="SAML2.ArtifactResolution" />
+                </list>
+            </property>
+        </bean>
+        -->
+
+    </util:list>
+
+</beans>

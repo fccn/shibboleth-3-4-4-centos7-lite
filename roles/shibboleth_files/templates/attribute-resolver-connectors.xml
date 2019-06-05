@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Identity Provider 3 documentation:
+    https://wiki.shibboleth.net/confluence/display/IDP30/AttributeResolverConfiguration													
+-->
+<AttributeResolver
+xmlns="urn:mace:shibboleth:2.0:resolver"
+xmlns:sec="urn:mace:shibboleth:2.0:security"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schema/idp/shibboleth-attribute-resolver.xsd
+urn:mace:shibboleth:2.0:security http://shibboleth.net/schema/idp/shibboleth-security.xsd">
+        <!-- ========================================== -->
+    <!--     Static Data Connectors                 -->
+    <!-- ========================================== -->
+    
+        <!-- ATENÇÃO: DEVERÁ ALTERAR OS VALUES DE ACORDO COM A SUA INSTITUIÇÃO.
+             Mais informação sobre os atributos em: https://confluence.fccn.pt/display/RCTSAAI/Atributos+RCTSaai+e+eduGAIN
+        --> 
+    <DataConnector id="staticAttributes" xsi:type="Static">
+        <Attribute id="o">
+            <Value>FCCN</Value>
+        </Attribute>
+        <Attribute id="shac_organization">
+            <Value>fccn.pt</Value>
+        </Attribute>
+        <Attribute id="ou">
+            <Value>FCCN</Value>
+        </Attribute>
+        <Attribute id="PersonAffiliation">
+            <Value>staff</Value>
+        </Attribute>
+    </DataConnector>
+										 
+
+    <!-- ========================================== -->
+    <!--     myLDAP Data Connectors                 -->
+    <!-- ========================================== -->
+    <DataConnector id="myLDAP" xsi:type="LDAPDirectory"
+        ldapURL="%{idp.attribute.resolver.LDAP.ldapURL}"
+        baseDN="%{idp.attribute.resolver.LDAP.baseDN}" 
+        principal="%{idp.attribute.resolver.LDAP.bindDN}"
+        principalCredential="%{idp.attribute.resolver.LDAP.bindDNCredential}"
+        useStartTLS="%{idp.attribute.resolver.LDAP.useStartTLS:true}">
+        <FilterTemplate>
+            <![CDATA[
+                %{idp.attribute.resolver.LDAP.searchFilter}
+                        ]]>
+                </FilterTemplate>
+        </DataConnector>
+
+		<!-- ========================================== -->
+    <!--     myStoredId Data Connectors             -->
+    <!-- ========================================== -->
+        <DataConnector id="myStoredId" xsi:type="StoredId"
+        generatedAttributeID="persistentID"
+        sourceAttributeID="%{idp.persistentId.sourceAttribute}"
+        salt="%{idp.persistentId.salt}" >
+        <Dependency ref="myLDAP" />
+                <BeanManagedConnection>shibboleth.PostgreSQLDataSource</BeanManagedConnection>
+        </DataConnector>
+
+</AttributeResolver>

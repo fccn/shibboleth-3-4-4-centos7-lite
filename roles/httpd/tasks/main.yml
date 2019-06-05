@@ -1,0 +1,97 @@
+---
+
+- include_vars: group_vars/general_definitions
+
+- name: Rename ssl.conf para z_ssl.conf
+  command: mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/z_ssl.conf
+
+- name: Recarregar configurações do Apache no SytemCTL
+  systemd:
+    name: httpd
+    state: reloaded
+
+- name: Activar servico de Apache no SytemCTL
+  systemd:
+    name: httpd.service
+    enabled: true
+    masked: no
+
+- name: Config Apache server-name.conf
+  template:
+    src: server-name.conf
+    dest: /etc/httpd/conf.d/{{ server_name }}.conf
+
+# Limpar configuracoes antigas
+##############################
+- name: Limpar Shibboleth Header
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    state: absent
+    regexp: '^# Shibboleth configurations'
+
+- name: Limpar opção ServerTokens
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    state: absent
+    regexp: '^ServerTokens Prod'
+
+- name: Limpar opção ServerSignature
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    state: absent
+    regexp: '^ServerSignature off'
+
+- name: Limpar opção RewriteEngine
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    state: absent
+    regexp: '^RewriteEngine On'
+
+- name: Limpar opção RewriteCond
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    state: absent
+    regexp: '^RewriteCond %{HTTPS} off'
+
+- name: Limpar opção RewriteRule
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    state: absent
+    regexp: '^RewriteRule.*'
+
+# Adicionar configurações
+#########################
+- name: Adicionar opcoes adicionais no Apache
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    state: present
+    insertafter: EOF
+    line: '# Shibboleth configurations'
+
+- name: Adicionar opção RewriteEngine no Apache
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    state: present
+    insertafter: EOF
+    line: 'RewriteEngine On'
+
+- name: Adicionar opção RewriteCond no Apache
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    state: present
+    insertafter: EOF
+    line: 'RewriteCond %{HTTPS} off'
+
+- name: Adicionar opção RewriteRule no Apache
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    state: present
+    insertafter: EOF
+    line: 'RewriteRule ^/?(.*) https://{{ server_name }}/$1 [R,L]'
+
+- name: Adicionar httpd-deflate.conf
+  template:
+    src: httpd-deflate.conf
+    dest: /etc/httpd/conf.d/
+    mode: 0644
+  notify: restart httpd

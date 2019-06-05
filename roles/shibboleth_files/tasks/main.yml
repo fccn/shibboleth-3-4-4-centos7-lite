@@ -1,0 +1,352 @@
+---
+
+- include_vars: group_vars/general_definitions
+
+- name: Actualizar saml-nameid.xml
+  template: src=saml-nameid.xml dest=/opt/shibboleth-idp/conf/saml-nameid.xml mode=0644
+
+- name: Descomentar parametro [StoredPersistentIdGenerator] em saml-nameid.properties
+  lineinfile: dest=/opt/shibboleth-idp/conf/saml-nameid.properties
+              regexp='^#idp.persistentId.generator.*'
+              line='idp.persistentId.generator = shibboleth.StoredPersistentIdGenerator'
+              state=present
+
+#Quando se usa o PostgreSQL
+- name: Descomentar parametro [dataSource] em saml-nameid.properties
+  lineinfile: dest=/opt/shibboleth-idp/conf/saml-nameid.properties
+              regexp='^#idp.persistentId.dataSource.*'
+              line='idp.persistentId.dataSource = shibboleth.PostgreSQLDataSource'
+              state=present
+
+- name: Descomentar parametro [sourceAttribute] em saml-nameid.properties
+  lineinfile: dest=/opt/shibboleth-idp/conf/saml-nameid.properties
+              regexp='^#idp.persistentId.sourceAttribute.*'
+              line='idp.persistentId.sourceAttribute = sAMAccountName'
+              state=present
+
+
+- name: copiar subject-c14n.xml
+  copy:
+    src: "{{ role_path }}/templates/subject-c14n.xml"
+    dest: /opt/shibboleth-idp/conf/c14n/
+    backup: yes
+
+- name: Gerar string de SALT
+  shell: openssl rand -base64 36
+  register: salt_string
+
+- set_fact: var_salt_string={{ salt_string }}
+
+# - debug: var=var_salt_string
+
+- name: Adicionar LDAP configs [credentials.properties]
+  lineinfile:
+    dest: /opt/shibboleth-idp/conf/credentials.properties
+    insertbefore: BOF
+    line: 'idp.authn.LDAP.bindDNCredential = {{ ldap_password }}'
+    state: present
+
+- name: Adicionar SALT no ficheiro [credentials.properties]
+  lineinfile:
+    dest: /opt/shibboleth-idp/conf/credentials.properties
+    insertbefore: BOF
+    line: 'idp.persistentId.salt = {{ var_salt_string.stdout }}'
+    state: present
+
+- name: Copiar pagina de Status do IdP
+  copy:
+    src: "{{ role_path }}/files/jstl-1.2.jar"
+    dest: /opt/shibboleth-idp/edit-webapp/WEB-INF/lib
+
+- name: Recriar o arquivo idp.war
+  shell: JAVACMD=/usr/bin/java /opt/shibboleth-idp/bin/build.sh -Didp.target.dir=/opt/shibboleth-idp
+  register: shell_output
+
+- debug: var=shell_output.stdout
+
+- name: Mudar regras de acesso
+  lineinfile: dest=/opt/shibboleth-idp/conf/access-control.xml
+              regexp='\s*p:(allowedRanges)=.*'
+              line='p:allowedRanges="#{ {\'127.0.0.1/32\', \'::1/128\' , \'{{ ip_range_access_control }}\',\'2001:690:2080:8009::/64\' } }" />'
+              state=present
+
+- name: Criar pasta no shibboleth para config de [Large Objects]
+  file: dest=/opt/shibboleth-idp/edit-webapp/WEB-INF/classes/META-INF state=directory recurse=yes mode=0644
+
+- name: Activar Large Objects do shibboleth
+  template: src=orm.xml dest=/opt/shibboleth-idp/edit-webapp/WEB-INF/classes/META-INF/ mode=0644
+
+- name: Recriar o arquivo idp.war
+  shell: JAVACMD=/usr/bin/java /opt/shibboleth-idp/bin/build.sh -Didp.target.dir=/opt/shibboleth-idp
+  register: shell_output
+
+- debug: var=shell_output.stdout
+
+- name: Copiar Libraries de JARs utilizadas pelo Tomcat e pelo Shibboleth
+  copy:
+    src: /usr/share/java/postgresql-jdbc.jar
+    dest: /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/
+    remote_src: yes
+
+- copy:
+    src: /usr/share/java/postgresql-jdbc.jar
+    dest: /opt/tomcat/lib/
+    remote_src: yes
+
+- copy:
+    src: /opt/tomcat/lib/tomcat-jdbc.jar
+    dest: /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/
+    remote_src: yes
+
+- name: Descomprimir pacote commons-pool2-2.4.2-bin.tar.gz
+  unarchive:
+    src: "{{ role_path }}/files/commons-pool2-2.4.2-bin.tar.gz"
+    dest: /usr/local/src/
+
+- copy:
+    src: /usr/local/src/commons-pool2-2.4.2/commons-pool2-2.4.2.jar
+    dest: /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/
+    remote_src: yes
+
+- name: Copiar commons-pool.jar
+  copy:
+    src: "{{ role_path }}/files/commons-pool.jar"
+    dest: /opt/tomcat/lib/
+
+- name: Copiar commons-dbcp.jar
+  copy:
+    src: "{{ role_path }}/files/commons-dbcp.jar"
+    dest: /opt/tomcat/lib/
+
+- name: Copiar sqljdbc42.jar
+  copy:
+    src: "{{ role_path }}/files/sqljdbc42.jar"
+    dest: /opt/shibboleth-idp/edit-webapp/WEB-INF/lib/
+
+- name: Recriar o arquivo idp.war
+  shell: JAVACMD=/usr/bin/java /opt/shibboleth-idp/bin/build.sh -Didp.target.dir=/opt/shibboleth-idp
+  register: shell_output
+
+- debug: var=shell_output.stdout
+
+- name: Configuração services.xml
+  template:
+    src: services.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: Configuração idp.properties
+  template:
+    src: idp.properties
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: Copiar idp.custom.properties
+  template:
+    src: idp-custom.properties
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+
+- name: Copiar ficheiro de configuracao de metadata rctsaai
+  template:
+    src: metadata-provider-rctsaai.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: Copiar ficheiro de configuracao de metadata aaitest
+  template:
+    src: metadata-provider-aaitest.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: Copiar ficheiro de configuracao de metadata 
+  template:
+    src: metadata-provider-interfederation.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: Copiar ficheiro de configuracao de metadata clarin
+  template:
+    src: metadata-provider-clarin.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: Copiar ficheiro de configuracao de metadata openconext QUA
+  template:
+    src: metadata-provider-engine-qua-rctsaai.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: Copiar ficheiro de configuracao de metadata openconext
+  template:
+    src: metadata-provider-engine-rctsaai.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: Copiar ficheiro de configuracao de metadata
+  template:
+    src: metadata-provider-engine-rctsaai-fccn.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: Copiar ficheiros de resolver connectors do shibboleth
+  template:
+    src: attribute-resolver-connectors.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: copiar ficheiro attribute resolver rctsaai 
+  template:
+    src: attribute-resolver-rctsaai-core.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: copiar ficheiro attribute resolver ldap
+  template:
+    src: attribute-resolver-ldap.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: copiar ficheiro attribute resolver interfederation
+  template:
+    src: attribute-resolver-interfederation-core.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: Copiar ficheiro atribute-filter
+  template:
+    src: attribute-filter.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: Copiar context-check-intercept-config
+  template:
+    src: context-check-intercept-config.xml
+    dest: /opt/shibboleth-idp/conf/intercept/
+    mode: 0644
+    backup: yes
+
+- name: Copiar attribute-sourced-subject-c14n-config
+  template:
+    src: attribute-sourced-subject-c14n-config.xml
+    dest: /opt/shibboleth-idp/conf/intercept/
+    mode: 0644
+    backup: yes
+
+- name: Copiar ficheiro de ligação a base de dados PostgreSQL shibboleth
+  template:
+    src: global.xml
+    dest: /opt/shibboleth-idp/conf/
+    mode: 0644
+    backup: yes
+
+- name: Configuração de Logs
+  template:
+    src: logback.xml
+    dest: /opt/shibboleth-idp/conf/
+    backup: yes
+    mode: 0644
+
+
+- name: Configuração da Autenticação - LDAP
+  template:
+    src: ldap.properties
+    dest: /opt/shibboleth-idp/conf/
+    backup: yes
+    mode: 0644
+
+
+- name: Activar a visualização dos "Termos e Condições de Utilização" e o "User Consent"
+  template:
+    src: relying-party.xml
+    dest: /opt/shibboleth-idp/conf/
+    backup: yes
+    mode: 0644
+
+
+- name: Atualizar o consent-intercept-config
+  template:
+    src: consent-intercept-config.xml
+    dest: /opt/shibboleth-idp/conf/intercept/
+    backup: yes
+    mode: 0644
+
+
+- name: Configuração para a rotação periódica de chaves
+  template:
+    src: rotate-sealer.sh
+    dest: /opt/shibboleth-idp/credentials/
+    mode: 0755
+
+- name: Criar cron para rotação das chaves
+  template:
+    src: idp-rotate-sealer
+    dest: /etc/cron.d/
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create certificates old folder
+  file: 
+    path: /opt/shibboleth-idp/credentials/old/
+    state: directory
+
+- name: ficheiro idp.key 
+  copy:
+    src: /opt/shibboleth-idp/credentials/idp-signing.key
+    dest: /opt/shibboleth-idp/credentials/idp.key
+
+- name: ficheiro idp.crt
+  copy:
+    src: /opt/shibboleth-idp/credentials/idp-signing.crt
+    dest: /opt/shibboleth-idp/credentials/idp.crt
+
+- name: mover para pasta old os certificados nao utilizados - idp-signing.key
+  command: mv /opt/shibboleth-idp/credentials/idp-signing.key /opt/shibboleth-idp/credentials/old/idp-signing.key
+
+- name: mover para pasta old os certificados nao utilizados - idp-encryption.ke
+  command: mv /opt/shibboleth-idp/credentials/idp-encryption.key /opt/shibboleth-idp/credentials/old/idp-encryption.key
+
+- name: mover para pasta old os certificados nao utilizados - idp-backchannel.p12
+  command: mv /opt/shibboleth-idp/credentials/idp-backchannel.p12 /opt/shibboleth-idp/credentials/old/idp-backchannel.p12
+
+- name: mover para pasta old os certificados nao utilizados - idp-signing.crt
+  command: mv /opt/shibboleth-idp/credentials/idp-signing.crt /opt/shibboleth-idp/credentials/old/idp-signing.crt
+
+- name: mover para pasta old os certificados nao utilizados - idp-encryption.crt
+  command: mv /opt/shibboleth-idp/credentials/idp-encryption.crt /opt/shibboleth-idp/credentials/old/idp-encryption.crt
+
+- name: mover para pasta old os certificados nao utilizados - idp-backchannel.crt
+  command: mv /opt/shibboleth-idp/credentials/idp-backchannel.crt /opt/shibboleth-idp/credentials/old/idp-backchannel.crt
+
+- name: chown tomcat na directoria shibboleth
+  command: chown -R tomcat:tomcat /opt/shibboleth-idp/
+
+- name: Recarregar serviços do SystemCTL
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: crond
+
+- name: restart postgresql
+  systemd: name=postgresql state=restarted
+
+- name: restart httpd
+  systemd: name=httpd state=restarted
+
+- name: restart tomcat
+  systemd: name=tomcat state=restarted

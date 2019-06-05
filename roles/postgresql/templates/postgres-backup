@@ -1,0 +1,5 @@
+# Cria um dump diario as 4:40 e cria o respetivo ficheiro comprimido (ex.: dumpall-Mon.sql.gz)
+40 4 * * * postgres pg_dumpall | gzip > {{ postgresql_backup_dest }}/dumpall-`date +\%a`.sql.gz
+ 
+# Backup adicional diario
+20 * * * * postgres pg_dumpall | gzip > {{ postgresql_backup_dest }}/dumpall-latest.sql.gz

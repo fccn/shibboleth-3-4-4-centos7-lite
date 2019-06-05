@@ -1,0 +1,184 @@
+---
+
+- include_vars: group_vars/general_definitions
+
+- name: Add EPEL repository
+  yum:
+    name : https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+    state: present
+
+- name: Add repository
+  yum:
+    name : https://centos7.iuscommunity.org/ius-release.rpm
+    state: present
+
+- name: Import EPEL GPG key.
+  rpm_key:
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+    state: present
+
+- name: Install EPEL Repo - Centos/RHEL 7
+  command: rpm -ivh /tmp/epel-release-latest-7.noarch.rpm creates=/etc/yum.repos.d/epel.repo
+  when: "ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7'"
+
+- name: Install system pre-requirements packages
+  yum: pkg={{ item }}
+  with_items:
+  - sudo
+  - curl
+  - wget
+  - gcc
+  - openssl
+  - unzip
+  - ntp
+  - httpd
+  - mod_ssl
+  - java-1.8.0-openjdk.x86_64
+  - java-1.8.0-openjdk-devel
+  - python36u
+  - python36u-pip # isto é para dar suporte ao Ansible em perguntas na prompt
+  - python36u-devel
+  - libselinux-python
+  - libxml2
+  - dbus-glib-devel
+  - dbus-glib
+  - python-slip-dbus
+  - dbus-python
+  - firewalld
+
+- name: check for presence of SELinux config file
+  stat: path=/etc/sysconfig/selinux
+  register: selinux_config
+
+- name: check for presence of SELinux binaries
+  stat: path=/usr/sbin/setenforce
+  register: selinux_binaries
+
+- name: check for SELinux status
+  shell: "/usr/sbin/sestatus | grep 'SELinux status' | awk '{ print $3 }'"
+  when: selinux_binaries.stat.exists == True
+  register: selinux_status
+
+- name: Desactivar SELinux em "/etc/sysconfig/selinux"
+  lineinfile: dest=/etc/sysconfig/selinux state=present regexp='^SELINUX=' line='SELINUX=disable'
+  when: selinux_config.stat.exists == True
+
+- name: Desactivar SELinux NOW
+  command: /usr/sbin/setenforce 0
+  when: (selinux_binaries.stat.exists == True and selinux_status.stdout == "enabled")
+
+- name: Desactivar SELinux
+  selinux:
+    state: disabled
+
+- name: Check SELinux status
+  shell: "/usr/sbin/sestatus | egrep '^SELinux status: *disabled' || /usr/sbin/sestatus | egrep '^Current mode: *permissive'"
+  when: selinux_binaries.stat.exists == True
+
+# Nota: As regras em baixo são para abrir permanentemente
+# os portos da firewallpara o serviço HTTP e HTTPS
+######################################
+# sudo firewall-cmd --zone=public --add-service=http --permanent
+# sudo firewall-cmd --zone=public --add-service=https --permanent
+# sudo firewall-cmd --reload
+
+- name: Allow all IPv4 traffic coming in on port 80 (http)
+  firewalld:
+    zone: public
+    service: http
+    permanent: true
+    state: enabled
+
+- name: Allow all IPv4 traffic coming in on port 443 (https)
+  firewalld:
+    zone: public
+    service: https
+    permanent: true
+    state: enabled
+
+- name: Carregar novas regras do iptables
+  systemd: name=firewalld state=restarted
+
+- name: Recolher o melhor caminho para o java-1.8
+  shell: ls -la /usr/lib/jvm/ | grep java-1.8.*x86_64/jre$ | tr -s [:space:] '#' | cut -d# -f11
+  register: java_best_path
+
+- set_fact: java_home="/usr/lib/jvm/{{ java_best_path.stdout }}"
+
+# - debug: var=java_home
+
+- name: Verificar se profile ja tem JAVA_HOME definido
+  shell: grep JAVA_HOME .bash_profile | wc -l
+  register: java_home_exists
+
+# - debug: var=java_home_exists.stdout
+
+- name: Adicionar variavel de ambiente JAVA_HOME
+  lineinfile: dest=~/.bash_profile
+              state=present
+              insertbefore='^PATH='
+              line='export JAVA_HOME={{ java_home }}\nPATH=$JAVA_HOME/bin:$PATH'
+  when: java_home_exists.stdout == "0"
+
+- name: Verificar se profile ja tem IDP_SRC definido
+  shell: grep IDP_SRC .bash_profile | wc -l
+  register: idp_src_home_exists
+
+# - debug: var=idp_src_home_exists.stdout
+
+- name: Adicionar variavel de ambiente IDP_SRC
+  lineinfile: dest=~/.bash_profile
+              state=present
+              insertbefore='^PATH='
+              line='\nexport IDP_SRC=/usr/local/src/shibboleth-identity-provider-{{ IDP_VERSION }}\n'
+  when: idp_src_home_exists.stdout == "0"
+
+- name: Verificar alias
+  shell: grep tail_tom .bash_profile | wc -l
+  register: idp_src_home_exists
+
+- name: Adicionar alias de logs
+  lineinfile:
+    dest: ~/.bash_profile
+    state: present
+    insertbefore: 'EOF'
+    line: "\nalias tail_tom='tail -100f /opt/tomcat/logs/catalina.out'\nalias tail_shi='tail -100f /opt/shibboleth-idp/logs/idp-process.log'\nalias tail_idp='tail -100f /etc/httpd/logs/{{ server_name }}.access.log'"
+
+- shell: '. /root/.bash_profile'
+  become: true
+  become_method: sudo
+  become_user: root
+
+- name: Add group "tomcat"
+  group: name=tomcat
+
+- name: Add user "tomcat"
+  user:
+    name: tomcat
+    group: tomcat
+    shell: /bin/false
+    createhome: yes
+    home: /opt/tomcat
+    state: present
+
+- name: Configurar NTP para arrancar sempre
+  systemd:
+    name: ntpd
+    enabled: true
+    masked: no
+
+- name: Starting NTP service
+  systemd:
+    name: ntpd
+    state: restarted
+
+- name: Copiar pagina de Status do IdP
+  unarchive:
+    src: "{{ role_path }}/files/pexpect-3.3.tar.gz"
+    dest: /usr/local/src/
+
+- name: Instalar pacote pexpect
+  shell: python setup.py install
+  args:
+    chdir: /usr/local/src/pexpect-3.3
+    executable: /bin/bash

@@ -1,0 +1,109 @@
+---
+
+- include_vars: group_vars/general_definitions
+
+- name: Validar se já existe um Tomcat no destino
+  stat: path=/opt/tomcat
+  register: tomcat_exists
+
+- name: Apagar Tomcat antigo
+  file:
+    path: /opt/tomcat
+    state: absent
+  when: tomcat_exists.stat.exists
+
+- name: Descomprimir pacote apache-tomcat-{{ tomcat_version }}.tar.gz
+  unarchive:
+    src: "{{ role_path }}/files/apache-tomcat-{{ tomcat_version }}.tar.gz"
+    dest: /opt/
+
+- name: Mudar nome da pasta decomprimida
+  shell: mv /opt/apache-tomcat-{{ tomcat_version }} /opt/tomcat
+
+- name: Apagar ficheiro de Tomcat comprimido
+  file: path=/opt/apache-tomcat-{{ tomcat_version }}.tar.gz state=absent
+
+# Aqui é obrigatorio garantir que o grupo e o utilizador Tomcat
+# foi criado no playbook de sistema
+###############################################################
+- name: Mudar de owner
+  file:
+    remote_src: yes
+    dest: /opt/tomcat
+    owner: tomcat
+    group: tomcat
+    recurse: yes
+
+# Atenção: A recolha do caminho para o JAVA é fundamental
+# para o proximo template que vai ser aplicado
+#########################################################
+- name: Recolher o melhor caminho para o java-1.8
+  shell: ls -la /usr/lib/jvm/ | grep java-1.8.*x86_64/jre$ | tr -s [:space:] '#' | cut -d# -f11
+  register: java_best_path
+
+- set_fact: java_home="/usr/lib/jvm/{{ java_best_path.stdout }}"
+
+- name: Criar ficheiro de servico do Tomcat no sistema
+  template:
+    src: tomcat.service
+    dest: /etc/systemd/system/
+    mode: 0644
+
+- name: Recarregar serviços do SystemCTL
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: crond
+
+- name: Garantir que o Tomcat está a correr (e activo no arranque da máquina)
+  systemd:
+    name: tomcat
+    enabled: yes
+    masked: no
+
+- name: restart tomcat
+  systemd:
+    name: tomcat.service
+    state: restarted
+
+- name: Garantir execução na pasta /opt/tomcat/conf
+  file:
+    path: /opt/tomcat/conf
+    state: directory
+    mode: 0760
+
+- name: Configurar server.xml
+  template:
+    src: server.xml
+    dest: /opt/tomcat/conf/
+    owner: tomcat
+    group: tomcat
+    mode: 0660
+
+- name: Criar pasta Catalina do Tomcat
+  file:
+    path: /opt/tomcat/conf/Catalina/localhost
+    state: directory
+    owner: tomcat
+    group: tomcat
+    mode: 0760
+    recurse: yes
+
+- name: Configurar idp.xml
+  template:
+    src: idp.xml
+    dest: /opt/tomcat/conf/Catalina/localhost
+    owner: tomcat
+    group: tomcat
+    mode: 0660
+
+- name: Configurar context.xml
+  template:
+    src: context.xml
+    dest: /opt/tomcat/conf/Catalina/
+    owner: tomcat
+    group: tomcat
+    mode: 0660
+  
+- name: Reiniciar o Tomcat
+  systemd: name=tomcat state=restarted

@@ -1,0 +1,17 @@
+---
+
+- hosts: all
+  remote_user: root
+  become: yes
+  become_method: sudo
+
+  roles:
+  - check-system
+  - system
+  - httpd
+  - tomcat
+  - postgresql
+  - shibboleth
+  - shibboleth_files
+  - layout
+  - performance

@@ -1,0 +1,110 @@
+---
+
+- include_vars: group_vars/general_definitions
+
+- name: Criar pasta base para o Shibboleth
+  file:
+    path: /usr/local/dist
+    state: directory
+    owner: root
+    group: root
+    mode: 0660
+
+- name: Descomprimir arquivo do Shibboleth
+  unarchive:
+    src: "{{ role_path }}/files/shibboleth-identity-provider-{{ IDP_VERSION }}.tar.gz"
+    owner: root
+    group: root
+    dest: /usr/local/dist/
+
+- name: Validar se ja existe uma instalacao de Shibboleth
+  stat: path=/opt/shibboleth-idp
+  register: shibboleth_exists
+
+- name: Apagar antiga instalacao do Shibboleth
+  file: dest=/opt/shibboleth-idp state=directory state=absent
+  when: shibboleth_exists.stat.exists
+
+# generate a password for client-side encryption
+- name: Gerar string de SALT
+  shell: openssl rand -base64 12
+  register: sealer_string
+
+- set_fact: var_sealer_string={{ sealer_string }}
+
+- name: Recolher o melhor caminho para o java-1.8
+  shell: ls -la /usr/lib/jvm/ | grep java-1.8.*x86_64/jre$ | tr -s [:space:] '#' | cut -d# -f11
+  register: java_best_path
+
+- set_fact: var_java_home="/usr/lib/jvm/{{ java_best_path.stdout }}"
+
+- name: Executar a instalacao do Shibboleth
+  shell: "/usr/local/dist/shibboleth-identity-provider-{{ IDP_VERSION }}/bin/install.sh \
+  -Didp.merge.properties=/templates/idp.merge.properties \
+  -Didp.src.dir=/usr/local/dist/shibboleth-identity-provider-{{ IDP_VERSION }} \
+  -Didp.target.dir={{ installation_directory }} \
+  -Didp.scope={{ attribute_scope }} \
+  -Didp.host.name={{ server_name }} \
+  -Didp.sealer.password={{ var_sealer_string.stdout }} \
+  -Didp.keystore.password={{ cookie_Encryption_key_password }} \
+  -Didp.noprompt=true"
+  args:
+    executable: /bin/bash
+    creates: "{{ installation_directory }}"
+  environment:
+       JAVA_HOME: /usr/lib/jvm/jre-1.8.0-openjdk
+
+- name: Copiar credentials.properties para a pasta /opt/shibboleth-idp/conf/credentials.properties
+  template:
+    src: credentials.properties
+    dest: /opt/shibboleth-idp/conf
+
+# generate a password for client-side encryption
+- name: Gerar password PSQL
+  shell: openssl rand -base64 12
+  register: psql_string
+
+- set_fact: var_psql_string={{ psql_string }}
+
+- name: Create postgres user for my app
+  become: yes
+  become_user: postgres
+  postgresql_user:
+    name: "shibboleth"
+    password: "{{ var_psql_string.stdout }}"
+
+- name: Adicionar psql password no ficheiro [credentials.properties]
+  lineinfile:
+    dest: /opt/shibboleth-idp/conf/credentials.properties
+    insertbefore: BOF
+    line: 'psql.password = {{ var_psql_string.stdout }}'
+    state: present
+
+- name: Adicionar Sealer password no ficheiro [credentials.properties]
+  lineinfile:
+    dest: /opt/shibboleth-idp/conf/credentials.properties
+    insertbefore: BOF
+    line: 'idp.sealer.password = {{ var_sealer_string.stdout }}'
+    state: present
+
+
+- name: Recriar o arquivo idp.war
+  shell: JAVACMD=/usr/bin/java /opt/shibboleth-idp/bin/build.sh -Didp.target.dir=/opt/shibboleth-idp
+  register: shell_output
+
+- debug: var=shell_output.stdout
+
+- name: Recarregar serviços do SystemCTL
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: crond
+
+- name: restart postgresql
+  systemd: name=postgresql state=restarted
+
+- name: restart httpd
+  systemd: name=httpd state=restarted
+
+- name: restart tomcat
+  systemd: name=tomcat state=restarted

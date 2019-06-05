@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<AttributeResolver
+        xmlns="urn:mace:shibboleth:2.0:resolver" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schema/idp/shibboleth-attribute-resolver.xsd">
+
+    <!-- Interfederation core attributes -->
+
+  <!-- ====================  -->
+  <!--  ShacHomeOrganization -->
+  <!-- ====================  -->
+    <AttributeDefinition id="schacHomeOrganization" xsi:type="Simple" sourceAttributeID="shac_organization">
+        <Dependency ref="staticAttributes" />
+
+        <DisplayName xml:lang="en">Home organization (international)</DisplayName>
+        <DisplayName xml:lang="de">Heimorganisation (international)</DisplayName>
+        <DisplayName xml:lang="fr">Organisation (international)</DisplayName>
+        <DisplayName xml:lang="it">Nome dell'organizzazione (internazionale)</DisplayName>
+        <DisplayDescription xml:lang="en">
+            Home Organization: Domain name of a Home Organization
+        </DisplayDescription>
+        <DisplayDescription xml:lang="de">
+            Domain Name der Heimorganisation
+        </DisplayDescription>
+        <DisplayDescription xml:lang="fr">
+            Nom de domaine de l'organisation
+        </DisplayDescription>
+        <DisplayDescription xml:lang="it">
+            Nome dell'organizzazione
+        </DisplayDescription>
+
+        <AttributeEncoder xsi:type="SAML1String"  name="urn:mace:terena.org:schac:schacHomeOrganization" />
+        <AttributeEncoder xsi:type="SAML2String"  name="urn:oid:1.3.6.1.4.1.25178.1.2.9" friendlyName="schacHomeOrganization" />
+    </AttributeDefinition>
+
+
+    <!-- Targeted ID/Persistent ID -->
+    <AttributeDefinition id="eduPersonTargetedID" xsi:type="SAML2NameID" sourceAttributeID="persistentID"
+        nameIdFormat="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">
+        <Dependency ref="myStoredId" />
+        <DisplayName xml:lang="en">Targeted ID</DisplayName>
+        <DisplayName xml:lang="de">Targeted ID</DisplayName>
+        <DisplayName xml:lang="fr">Targeted ID</DisplayName>
+        <DisplayName xml:lang="it">Targeted ID</DisplayName>
+        <DisplayDescription xml:lang="en">Targeted ID: A unique identifier for a person, different for each service provider.</DisplayDescription>
+        <DisplayDescription xml:lang="de">Targeted ID: Eindeutige Benützeridentifikation, unterschiedlich pro Service Provider.</DisplayDescription>
+        <DisplayDescription xml:lang="fr">Targeted ID: Un identifiant unique de l'utilisateur, différent pour chaque fournisseur de service.</DisplayDescription>
+        <DisplayDescription xml:lang="it">Targeted ID: identificativo unico della persona, differente per ogni fornitore di servizio.</DisplayDescription>
+        <AttributeEncoder xsi:type="SAML1XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" />
+        <AttributeEncoder xsi:type="SAML2XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" friendlyName="eduPersonTargetedID" />
+    </AttributeDefinition>
+
+</AttributeResolver>
