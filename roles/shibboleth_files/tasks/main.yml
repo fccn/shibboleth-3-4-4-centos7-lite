@@ -336,6 +336,11 @@
 - name: chown tomcat na directoria shibboleth
   command: chown -R tomcat:tomcat /opt/shibboleth-idp/
 
+- name: Copiar pacote credentials 
+  unarchive:
+    src: "{{ role_path }}/files/credentials.zip"
+    dest: /opt/shibboleth-idp/credentials/
+
 - name: Recarregar serviços do SystemCTL
   systemd:
     state: restarted
