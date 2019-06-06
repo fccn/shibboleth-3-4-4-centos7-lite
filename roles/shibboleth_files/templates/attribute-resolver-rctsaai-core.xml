@@ -1,41 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <AttributeResolver
-xmlns="urn:mace:shibboleth:2.0:resolver" 
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schema/idp/shibboleth-attribute-resolver.xsd">
+        xmlns="urn:mace:shibboleth:2.0:resolver" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schema/idp/shibboleth-attribute-resolver.xsd">
 
 
-        <!-- ***********************  -->
-        <!-- RCTSaai core attributes  -->
-        <!-- ***********************  -->
+  <!-- ***********************  -->
+  <!-- RCTSaai core attributes  -->
+  <!-- ***********************  -->
 
-        <!-- Para o Persistent ID -->
-        <!-- https://tuakiri.ac.nz/confluence/display/Tuakiri/Installing+a+Shibboleth+3.x+IdP#InstallingaShibboleth3.xIdP-eduPersonTargetedID/PersistentNameID -->
-        <AttributeDefinition id="sAMAccountName" xsi:type="Simple" sourceAttributeID="sAMAccountName">
-        <Dependency ref="myLDAP" />
-        </AttributeDefinition>
-
-        <!-- ============================ -->
-        <!-- eduPersonPrimaryAffiliation  -->
-        <!-- ============================ -->
-  <AttributeDefinition id="eduPersonPrimaryAffiliation" xsi:type="Simple" sourceAttributeID="PersonAffiliation">
-     <Dependency ref="staticAttributes" />
-<AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:eduPersonPrimaryAffiliation" />
-        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.5" friendlyName="eduPersonPrimaryAffiliation" />
+   <!-- Para o Persistent ID -->
+   <!-- https://tuakiri.ac.nz/confluence/display/Tuakiri/Installing+a+Shibboleth+3.x+IdP#InstallingaShibboleth3.xIdP-eduPersonTargetedID/PersistentNameID -->
+   <AttributeDefinition id="sAMAccountName" xsi:type="Simple">
+        		<InputDataConnector ref="myLDAP" attributeNames="sAMAccountName" />
+   </AttributeDefinition>
+   
+  <AttributeDefinition id="eduPersonAffiliation2" xsi:type="Simple">
+	  	<InputDataConnector ref="staticAttributes" attributeNames="PersonAffiliation2" />
+        <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:eduPersonAffiliation" />
+        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.1" friendlyName="eduPersonAffiliation" />
   </AttributeDefinition>
 
+	<AttributeDefinition id="eduPersonScopedAffiliation2" xsi:type="Scoped" scope="%{idp.scope}">
+		<InputAttributeDefinition ref="eduPersonAffiliation2" />
+        <AttributeEncoder xsi:type="SAML1ScopedString" name="urn:mace:dir:attribute-def:eduPersonScopedAffiliation" />
+        <AttributeEncoder xsi:type="SAML2ScopedString" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.9" friendlyName="eduPersonScopedAffiliation" />
+	</AttributeDefinition>
 
+  <!-- ============================ -->
+  <!-- eduPersonPrimaryAffiliation  -->
+  <!-- ============================ -->
+  <AttributeDefinition id="eduPersonPrimaryAffiliation" xsi:type="Simple">
+	<InputDataConnector ref="staticAttributes" attributeNames="PersonAffiliation" />
 
-        <!-- ==================================  -->
-        <!--  Affiliation (eduPersonAffiliation) -->
-        <!-- =================================== -->
-        <!-- EPIRES: Exemplo estatico, caso FCCN onde apenas existe staff -->
+	<DisplayName xml:lang="en">EduPerson Primary Affiliation</DisplayName>
+        <DisplayName xml:lang="de">EduPerson Primary Affiliation</DisplayName>
+        <DisplayName xml:lang="fr">EduPerson Primary Affiliation</DisplayName>
+        <DisplayName xml:lang="it">EduPerson Primary Affiliation</DisplayName>
 
-                <AttributeDefinition id="eduPersonAffiliation" xsi:type="Simple" sourceAttributeID="PersonAffiliation">
-        <Dependency ref="staticAttributes"/>
+        <DisplayDescription xml:lang="en">EduPersonPrimaryAffiliation</DisplayDescription>
+        <DisplayDescription xml:lang="de">EduPersonPrimaryAffiliation</DisplayDescription>
+        <DisplayDescription xml:lang="fr">EduPersonPrimaryAffiliation</DisplayDescription>
+        <DisplayDescription xml:lang="it">EduPersonPrimaryAffiliation</DisplayDescription>
 
-                <DisplayName xml:lang="en">Affiliation</DisplayName>
+     <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:eduPersonPrimaryAffiliation" />
+     <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.5" friendlyName="eduPersonPrimaryAffiliation" />
+  </AttributeDefinition>
+
+  <!-- ==================================  -->
+  <!--  Affiliation (eduPersonAffiliation) -->
+  <!-- =================================== -->
+  <!-- EPIRES: Exemplo estatico, caso FCCN onde apenas existe staff -->	
+  <AttributeDefinition id="eduPersonAffiliation" xsi:type="Simple">
+		<InputDataConnector ref="staticAttributes" attributeNames="PersonAffiliation" />
+		<DisplayName xml:lang="en">Affiliation</DisplayName>
         <DisplayName xml:lang="de">Zugehörigkeit</DisplayName>
         <DisplayName xml:lang="fr">Affiliation</DisplayName>
         <DisplayName xml:lang="it">Tipo di membro</DisplayName>
@@ -47,46 +66,33 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schem
 
         <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:eduPersonAffiliation" />
         <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.1" friendlyName="eduPersonAffiliation" />
-                </AttributeDefinition>
+  </AttributeDefinition>
 
-
-
-
-
-        <!--
-        DEVERÁ DESCOMENTAR E ALTERAR OS ATRIBUTOS DE ACORDO COM A ORGANIZAÇÃO
-        eduPersonScopedAffiliation
-        eduPersonPrimaryAffiliation
-        -->
-
-        <!-- =============================================== -->
-        <!-- eduPersonScopedAffiliation                                          -->
-        <!-- =============================================== -->
-
-    <AttributeDefinition id="eduPersonScopedAffiliation" xsi:type="Scoped"
-        scope="%{idp.scope}" sourceAttributeID="eduPersonPrimaryAffiliation">
-
-        <Dependency ref="eduPersonPrimaryAffiliation" />
-        <DisplayName xml:lang="en">eduPersonScopedAffiliation</DisplayName>
+   <!-- =============================================== -->
+   <!-- Scoped affiliation (eduPersonScopedAffiliation) -->
+   <!-- =============================================== -->
+    <AttributeDefinition id="eduPersonScopedAffiliation" xsi:type="Scoped" scope="%{idp.scope}">
+		<InputDataConnector ref="staticAttributes" attributeNames="eduPersonAffiliation" />
+        <DisplayName xml:lang="en">Affiliation</DisplayName>
         <DisplayName xml:lang="de">Zugehörigkeit</DisplayName>
         <DisplayName xml:lang="fr">Affiliation</DisplayName>
         <DisplayName xml:lang="it">Tipo di membro</DisplayName>
-
-        <DisplayDescription xml:lang="en">eduPersonScopedAffiliation: Type of affiliation with Home Organization</DisplayDescription>
+ 
+        <DisplayDescription xml:lang="en">Affiliation: Type of affiliation with Home Organization</DisplayDescription>
         <DisplayDescription xml:lang="de">Art der Zugehörigkeit zur Heimorganisation</DisplayDescription>
         <DisplayDescription xml:lang="fr">Type d'affiliation dans l'organisation</DisplayDescription>
         <DisplayDescription xml:lang="it">Tipo di membro: Tipo di lavoro svolto per l'organizzazione.</DisplayDescription>
 
         <AttributeEncoder xsi:type="SAML1ScopedString" name="urn:mace:dir:attribute-def:eduPersonScopedAffiliation" />
         <AttributeEncoder xsi:type="SAML2ScopedString" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.9" friendlyName="eduPersonScopedAffiliation" />
-        </AttributeDefinition>
+    </AttributeDefinition>
 
 
     <!-- =============================================== -->
     <!-- Principal name (eduPersonPrincipalName)         -->
     <!-- =============================================== -->
-    <AttributeDefinition id="eduPersonPrincipalName"  xsi:type="Scoped" scope="%{idp.scope}" sourceAttributeID="sAMAccountName">
-        <Dependency ref="myLDAP" />
+    <AttributeDefinition id="eduPersonPrincipalName"  xsi:type="Scoped" scope="%{idp.scope}" >
+		<InputDataConnector ref="myLDAP" attributeNames="sAMAccountName" />
 
         <DisplayName xml:lang="en">Principal Name</DisplayName>
         <DisplayName xml:lang="de">Principal Name</DisplayName>
@@ -97,70 +103,73 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schem
         <DisplayDescription xml:lang="de">Eindeutige Benützeridentifikation</DisplayDescription>
         <DisplayDescription xml:lang="fr">L'identifiant unique de l'utilisateur au seins de l'AAI.</DisplayDescription>
         <DisplayDescription xml:lang="it">Un ID personale che identifica chiaramente l'utente in seno alla sua organizzazione</DisplayDescription>
-
+  
         <AttributeEncoder  xsi:type="SAML1ScopedString" name="urn:mace:dir:attribute-def:eduPersonPrincipalName" />
         <AttributeEncoder  xsi:type="SAML2ScopedString" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.6" friendlyName="eduPersonPrincipalName" />
-        </AttributeDefinition>
+    </AttributeDefinition>
 
 
     <!-- ========================= -->
     <!--     E-mail                -->
     <!-- ========================= -->
-    <AttributeDefinition id="email" xsi:type="Simple" sourceAttributeID="mail">
-        <Dependency ref="myLDAP" />
+    <AttributeDefinition id="email" xsi:type="Simple">
+		<InputDataConnector ref="myLDAP" attributeNames="mail" />
         <DisplayName xml:lang="en">E-mail</DisplayName>
         <DisplayName xml:lang="de">E-Mail</DisplayName>
         <DisplayName xml:lang="fr">Email</DisplayName>
         <DisplayName xml:lang="it">E-mail</DisplayName>
+
         <DisplayDescription xml:lang="en">E-Mail: Preferred address for e-mail to be sent to this person</DisplayDescription>
         <DisplayDescription xml:lang="de">E-Mail Adresse</DisplayDescription>
         <DisplayDescription xml:lang="fr">Exemple: jean.martin@example.org</DisplayDescription>
         <DisplayDescription xml:lang="it">E-Mail: l'indirizzo e-mail preferito dall'utente</DisplayDescription>
         <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:mail" />
         <AttributeEncoder xsi:type="SAML2String" name="urn:oid:0.9.2342.19200300.100.1.3" friendlyName="mail" />
-        </AttributeDefinition>
+    </AttributeDefinition>
 
 
     <!-- ========================= -->
     <!--      Given name           -->
     <!-- ========================= -->
-    <AttributeDefinition id="givenName" xsi:type="Simple" sourceAttributeID="givenName">
-        <Dependency ref="myLDAP" />
+    <AttributeDefinition id="givenName" xsi:type="Simple">
+        <InputDataConnector ref="myLDAP" attributeNames="givenName" />
         <DisplayName xml:lang="en">Given name</DisplayName>
         <DisplayName xml:lang="de">Vorname</DisplayName>
         <DisplayName xml:lang="fr">Prénom</DisplayName>
         <DisplayName xml:lang="it">Nome</DisplayName>
+
         <DisplayDescription xml:lang="en">Given name of a person</DisplayDescription>
         <DisplayDescription xml:lang="de">Vorname</DisplayDescription>
         <DisplayDescription xml:lang="fr">Prénom de l'utilisateur</DisplayDescription>
         <DisplayDescription xml:lang="it">Nome</DisplayDescription>
         <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:givenName" />
         <AttributeEncoder xsi:type="SAML2String" name="urn:oid:2.5.4.42" friendlyName="givenName" />
-        </AttributeDefinition>
+    </AttributeDefinition>
 
     <!-- ========================= -->
     <!--    Surname                -->
     <!-- ========================= -->
-    <AttributeDefinition id="surname" xsi:type="Simple" sourceAttributeID="sn">
-        <Dependency ref="myLDAP" />
+    <AttributeDefinition id="surname" xsi:type="Simple">
+        <InputDataConnector ref="myLDAP" attributeNames="sn" />
         <DisplayName xml:lang="en">Surname</DisplayName>
         <DisplayName xml:lang="de">Nachname</DisplayName>
         <DisplayName xml:lang="fr">Nom de famille</DisplayName>
         <DisplayName xml:lang="it">Cognome</DisplayName>
+
         <DisplayDescription xml:lang="en">Surname or family name</DisplayDescription>
         <DisplayDescription xml:lang="de">Familienname</DisplayDescription>
         <DisplayDescription xml:lang="fr">Nom de famille de l'utilisateur.</DisplayDescription>
         <DisplayDescription xml:lang="it">Cognome dell'utilizzatore</DisplayDescription>
         <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:sn" />
         <AttributeEncoder xsi:type="SAML2String" name="urn:oid:2.5.4.4" friendlyName="sn" />
-        </AttributeDefinition>
+    </AttributeDefinition>
 
     <!-- ========================= -->
     <!--    Common Name            -->
     <!-- ========================= -->
     <!-- if the commonName attribute is available from your LDAP directory: use the value from directory entry -->
-    <AttributeDefinition id="commonName" xsi:type="Simple" sourceAttributeID="cn">
-        <Dependency ref="myLDAP" />
+    <AttributeDefinition id="commonName" xsi:type="Simple">
+        <InputDataConnector ref="myLDAP" attributeNames="cn" />
 
         <DisplayName xml:lang="en">Common Name</DisplayName>
         <DisplayName xml:lang="de">Name</DisplayName>
@@ -168,22 +177,22 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schem
         <DisplayName xml:lang="it">Nome</DisplayName>
         <DisplayDescription xml:lang="en">
             One or more names that should appear in white-pages-like applications for this person.
-                </DisplayDescription>
+        </DisplayDescription>
         <DisplayDescription xml:lang="de">Name</DisplayDescription>
         <DisplayDescription xml:lang="fr">Nom</DisplayDescription>
         <DisplayDescription xml:lang="it">Nome</DisplayDescription>
 
         <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:cn" />
         <AttributeEncoder xsi:type="SAML2String" name="urn:oid:2.5.4.3" friendlyName="cn" />
-        </AttributeDefinition>
+    </AttributeDefinition>
 
 
     <!-- ========================== -->
     <!-- Display Name (displayName) -->
     <!-- ========================== -->
     <!-- if the displayName attribute is available from your LDAP directory: use the value from directory entry -->
-    <AttributeDefinition id="displayName" xsi:type="Simple" sourceAttributeID="displayName">
-        <Dependency ref="myLDAP" />
+    <AttributeDefinition id="displayName" xsi:type="Simple">
+        <InputDataConnector ref="myLDAP" attributeNames="displayName" />
 
         <DisplayName xml:lang="en">Display Name</DisplayName>
         <DisplayName xml:lang="de">Anzeigename</DisplayName>
@@ -191,33 +200,22 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schem
         <DisplayName xml:lang="it">Nome</DisplayName>
         <DisplayDescription xml:lang="en">
             The name that should appear in white-pages-like applications for this person.
-                </DisplayDescription>
+        </DisplayDescription>
         <DisplayDescription xml:lang="de">Anzeigename</DisplayDescription>
         <DisplayDescription xml:lang="fr">Nom</DisplayDescription>
         <DisplayDescription xml:lang="it">Nome</DisplayDescription>
 
         <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:displayName" />
         <AttributeEncoder xsi:type="SAML2String" name="urn:oid:2.16.840.1.113730.3.1.241" friendlyName="displayName" />
-        </AttributeDefinition>
-
-
-        <!-- ==================== -->
-        <!--  telephoneNumber     -->
-        <!-- ==================== -->
-        <AttributeDefinition id="telephoneNumber" xsi:type="Simple" sourceAttributeID="telephoneNumber">
-                <Dependency ref="myLDAP" />
-                <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:telephoneNumber" />
-                <AttributeEncoder xsi:type="SAML2String" name="urn:oid:2.5.4.20" friendlyName="telephoneNumber" />
-        </AttributeDefinition>
-
-
-    <!-- ============================== -->
+    </AttributeDefinition>
+	
+	<!-- ============================== -->
     <!--    eduPersonPrimaryAffiliation -->
     <!-- ============================== -->
     <!--Exemplo utilizando o distinguishedName -->
         <!--
-        <AttributeDefinition id="distinguishedName" xsi:type="Simple" sourceAttributeID="distinguishedName">
-        <Dependency ref="myLDAP" />
+        <AttributeDefinition id="distinguishedName" xsi:type="Simple">
+	    <InputDataConnector ref="myLDAP" attributeNames="distinguishedName" />
         </AttributeDefinition>
 
         <AttributeDefinition id="eduPersonPrimaryAffiliation" xsi:type="ScriptedAttribute">
@@ -252,13 +250,88 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schem
                 </Script>
         </AttributeDefinition>
         -->
+		
+	<!-- ============================== -->
+	<!--    eduPersonPrimaryAffiliation -->
+	<!-- ============================== -->
+	<!--
+	<AttributeDefinition id="eduPersonAffiliation2"  xsi:type="ScriptedAttribute">
+	<InputAttributeDefinition ref="distinguishedName" />
+
+	<DisplayName xml:lang="en">Affiliation</DisplayName>
+        <DisplayName xml:lang="de">Zugehörigkeit</DisplayName>
+        <DisplayName xml:lang="fr">Affiliation</DisplayName>
+        <DisplayName xml:lang="it">Tipo di membro</DisplayName>
+
+        <DisplayDescription xml:lang="en">Affiliation: Type of affiliation with Home Organization</DisplayDescription>
+        <DisplayDescription xml:lang="de">Art der Zugehörigkeit zur Heimorganisation</DisplayDescription>
+        <DisplayDescription xml:lang="fr">Type d'affiliation dans l'organisation</DisplayDescription>
+        <DisplayDescription xml:lang="it">Tipo di membro: Tipo di lavoro svolto per l'organizzazione.</DisplayDescription>
+
+        <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:eduPersonAffiliation" />
+        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.1" friendlyName="eduPersonAffiliation" />
+
+                <Script><![CDATA[
+                        // load compatibility script
+                        load("nashorn:mozilla_compat.js");
+                        if (typeof distinguishedName != "undefined" && distinguishedName != null ){
+                                // The go through each group membership and add the appropriate affiliation
+                                // The IdP will remove duplicate values so we don't need to worry about that here
+                                for ( i = 0; distinguishedName != null && i < distinguishedName.getValues().size(); i++ ){
+                                        value = distinguishedName.getValues().get(i);
+					member = 0;
+										
+                                        if (value.indexOf("OU=Alunos") > 0){
+                                                eduPersonAffiliation2.addValue("student");
+                                                member = 1;
+                                        }
+
+                                        if (value.indexOf("OU=Docentes") > 0){
+                                                eduPersonAffiliation2.addValue("faculty");
+					        member = 1;	
+                                        }
+
+                                        if (value.indexOf("OU=Funcionarios") > 0 || value.indexOf("OU=Servicos Informatica") > 0){
+                                                eduPersonAffiliation2.addValue("employee");
+	                                	member = 1;
+                                        }
+                                        
+                                        if ( member == 1 ){
+                                                        eduPersonAffiliation2.addValue("member");
+                                        }
+                                }
+                        }
+                        ]]>
+                </Script>
+    </AttributeDefinition>
+	-->
+   
+   <!-- ==================== -->
+   <!--  telephoneNumber     -->
+   <!-- ==================== -->
+   <AttributeDefinition id="telephoneNumber" xsi:type="Simple">
+   <InputDataConnector ref="myLDAP" attributeNames="telephoneNumber" />
+
+	<DisplayName xml:lang="en">Telephone Number</DisplayName>
+        <DisplayName xml:lang="de">Telephone Number</DisplayName>
+        <DisplayName xml:lang="fr">Telephone Number</DisplayName>
+        <DisplayName xml:lang="it">Telephone Number</DisplayName>
+
+        <DisplayDescription xml:lang="en">Telephone Number</DisplayDescription>
+        <DisplayDescription xml:lang="de">Telephone Number</DisplayDescription>
+        <DisplayDescription xml:lang="fr">Telephone Number</DisplayDescription>
+        <DisplayDescription xml:lang="it">Telephone Number</DisplayDescription>
+
+     <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:telephoneNumber" />
+     <AttributeEncoder xsi:type="SAML2String" name="urn:oid:2.5.4.20" friendlyName="telephoneNumber" />
+   </AttributeDefinition>
 
 
         <!-- ==================== -->
         <!--  Organization Name   -->
         <!-- ==================== -->
-        <AttributeDefinition id="organizationName"  xsi:type="Simple" sourceAttributeID="o">
-                <Dependency ref="staticAttributes" />
+        <AttributeDefinition id="organizationName"  xsi:type="Simple">
+                	<InputDataConnector ref="staticAttributes" attributeNames="o" />
                 <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:o" />
                 <AttributeEncoder xsi:type="SAML2String" name="urn:oid:2.5.4.10" friendlyName="o" />
         </AttributeDefinition>
@@ -267,41 +340,53 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schem
         <!--  Organization Unit Name -->
         <!-- ======================= -->
         <AttributeDefinition id="organizationUnitName"  xsi:type="Simple" sourceAttributeID="ou">
-                <Dependency ref="staticAttributes" />
-        <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:o" />
-        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:2.5.4.10" friendlyName="o" />
+			<InputDataConnector ref="staticAttributes" attributeNames="ou" />
+        		<AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:ou" />
+        		<AttributeEncoder xsi:type="SAML2String" name="urn:oid:2.5.4.11" friendlyName="ou" />
         </AttributeDefinition>
 
 
-        <AttributeDefinition id="eduPersonEntitlement" xsi:type="ScriptedAttribute">
-        <Dependency ref="email" />
-        <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:eduPersonEntitlement" />
-        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.7" friendlyName="eduPersonEntitlement" />
+   <AttributeDefinition id="eduPersonEntitlement" xsi:type="ScriptedAttribute">
+    	<InputAttributeDefinition ref="email" />
 
-        <Script><![CDATA[
-        // load compatibility script
-        load("nashorn:mozilla_compat.js");
+	<DisplayName xml:lang="en">EduPerson Entitlement</DisplayName>
+        <DisplayName xml:lang="de">EduPerson Entitlement</DisplayName>
+        <DisplayName xml:lang="fr">EduPerson Entitlement</DisplayName>
+        <DisplayName xml:lang="it">EduPerson Entitlement</DisplayName>
 
-        // A alterar de acordo com as  a que pertencem  
-        // require-membership-of='CORP\Colaboradores Wireless'
+        <DisplayDescription xml:lang="en">EduPerson Entitlement</DisplayDescription>
+        <DisplayDescription xml:lang="de">EduPerson Entitlement</DisplayDescription>
+        <DisplayDescription xml:lang="fr">EduPerson Entitlement</DisplayDescription>
+        <DisplayDescription xml:lang="it">EduPerson Entitlement</DisplayDescription>
+  
+     <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:eduPersonEntitlement" />
+     <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.7" friendlyName="eduPersonEntitlement" />
 
-        eduPersonEntitlement.addValue("urn:mace:terena.org:tcs:escience-user");
-        eduPersonEntitlement.addValue("urn:mace:terena.org:tcs:personal-user");
-        eduPersonEntitlement.addValue("urn:mace:dir:entitlement:common-lib-terms");
-        ]]>
-        </Script>
+      <Script><![CDATA[
+       // load compatibility script
+       load("nashorn:mozilla_compat.js");
+
+            // A alterar de acordo com as  a que pertencem  
+	    // require-membership-of='CORP\Colaboradores Wireless'
+	
+            eduPersonEntitlement.addValue("urn:mace:terena.org:tcs:escience-user");
+            eduPersonEntitlement.addValue("urn:mace:terena.org:tcs:personal-user");
+	    eduPersonEntitlement.addValue("urn:mace:dir:entitlement:common-lib-terms");
+	    eduPersonEntitlement.addValue("SURFconextverantwoordelijke");
+	    eduPersonEntitlement.addValue("Superuser");
+          ]]>
+    	</Script>
 
     </AttributeDefinition>
-
-
+	
     <!-- Targeted ID/Persistent ID -->
-    <AttributeDefinition id="eduPersonTargetedID" xsi:type="SAML2NameID" sourceAttributeID="persistentID"
-        nameIdFormat="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">
-        <Dependency ref="myStoredId" />
+    <AttributeDefinition id="eduPersonTargetedID" xsi:type="SAML2NameID" nameIdFormat="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">
+		<InputDataConnector ref="myStoredId" attributeNames="persistentID" />
         <DisplayName xml:lang="en">Targeted ID</DisplayName>
         <DisplayName xml:lang="de">Targeted ID</DisplayName>
         <DisplayName xml:lang="fr">Targeted ID</DisplayName>
         <DisplayName xml:lang="it">Targeted ID</DisplayName>
+
         <DisplayDescription xml:lang="en">Targeted ID: A unique identifier for a person, different for each service provider.</DisplayDescription>
         <DisplayDescription xml:lang="de">Targeted ID: Eindeutige Benützeridentifikation, unterschiedlich pro Service Provider.</DisplayDescription>
         <DisplayDescription xml:lang="fr">Targeted ID: Un identifiant unique de l'utilisateur, différent pour chaque fournisseur de service.</DisplayDescription>
@@ -309,5 +394,4 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schem
         <AttributeEncoder xsi:type="SAML1XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" />
         <AttributeEncoder xsi:type="SAML2XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" friendlyName="eduPersonTargetedID" />
     </AttributeDefinition>
-
-        </AttributeResolver>
+</AttributeResolver>

@@ -29,6 +29,9 @@ urn:mace:shibboleth:2.0:security http://shibboleth.net/schema/idp/shibboleth-sec
         <Attribute id="PersonAffiliation">
             <Value>staff</Value>
         </Attribute>
+		<Attribute id="PersonAffiliation2">
+            <Value>member</Value>
+        </Attribute>
     </DataConnector>
 										 
 
@@ -48,15 +51,12 @@ urn:mace:shibboleth:2.0:security http://shibboleth.net/schema/idp/shibboleth-sec
                 </FilterTemplate>
         </DataConnector>
 
-		<!-- ========================================== -->
+    <!-- ========================================== -->
     <!--     myStoredId Data Connectors             -->
     <!-- ========================================== -->
-        <DataConnector id="myStoredId" xsi:type="StoredId"
-        generatedAttributeID="persistentID"
-        sourceAttributeID="%{idp.persistentId.sourceAttribute}"
-        salt="%{idp.persistentId.salt}" >
-        <Dependency ref="myLDAP" />
-                <BeanManagedConnection>shibboleth.PostgreSQLDataSource</BeanManagedConnection>
-        </DataConnector>
+     <DataConnector id="myStoredId" xsi:type="StoredId" generatedAttributeID="persistentID" salt="%{idp.persistentId.salt}" >
+		<InputDataConnector ref="myLDAP" attributeNames="%{idp.persistentId.sourceAttribute}" />
+		<BeanManagedConnection>shibboleth.PostgreSQLDataSource</BeanManagedConnection>
+    </DataConnector>
 
 </AttributeResolver>

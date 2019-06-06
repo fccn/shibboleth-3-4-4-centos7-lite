@@ -9,9 +9,64 @@
     and their options.
 -->
 <AttributeFilterPolicyGroup id="ShibbolethFilterPolicy"
-xmlns="urn:mace:shibboleth:2.0:afp"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="urn:mace:shibboleth:2.0:afp http://shibboleth.net/schema/idp/shibboleth-afp.xsd">
+	xmlns="urn:mace:shibboleth:2.0:afp"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:mace:shibboleth:2.0:afp http://shibboleth.net/schema/idp/shibboleth-afp.xsd">
+
+     <AttributeFilterPolicy id="EnginePRD">
+ 
+                <PolicyRequirementRule xsi:type="AND">
+                        <Rule xsi:type="Requester" value="https://engine.rctsaai.pt/authentication/sp/metadata" />
+                        <Rule xsi:type="NOT">
+                                <Rule xsi:type="OR">
+                                        <Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
+                                        <Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*authmonit.*"/>
+                                </Rule>
+                        </Rule>
+                </PolicyRequirementRule>
+ 
+                <AttributeRule attributeID="surname">
+                        <PermitValueRule xsi:type="ANY" />
+                </AttributeRule>
+ 
+                <AttributeRule attributeID="givenName">
+                        <PermitValueRule xsi:type="ANY" />
+                </AttributeRule>
+ 
+                <AttributeRule attributeID="commonName">
+                        <PermitValueRule xsi:type="ANY" />
+                </AttributeRule>
+ 
+                <AttributeRule attributeID="displayName">
+                        <PermitValueRule xsi:type="ANY" />
+                </AttributeRule>
+ 
+                <AttributeRule attributeID="email">
+                        <PermitValueRule xsi:type="ANY" />
+                </AttributeRule>
+ 
+                <AttributeRule attributeID="uid">
+                        <PermitValueRule xsi:type="ANY" />
+                </AttributeRule>
+ 
+                <AttributeRule attributeID="schacHomeOrganization">
+                        <PermitValueRule xsi:type="ANY" />
+                </AttributeRule>
+ 
+                <AttributeRule attributeID="eduPersonAffiliation2">
+                        <PermitValueRule xsi:type="ANY"/>
+                </AttributeRule>
+ 
+                <AttributeRule attributeID="eduPersonScopedAffiliation2">
+                        <PermitValueRule xsi:type="ANY"/>
+                </AttributeRule>
+ 
+                <AttributeRule attributeID="eduPersonPrincipalName">
+                        <PermitValueRule xsi:type="ANY"/>
+                </AttributeRule>
+ 
+        </AttributeFilterPolicy>
+
 	
 	<!-- ==================================================================  -->
 	<!--      Atributos para a validacao no https://www.dreamspark.com/      -->
@@ -133,13 +188,13 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:afp http://shibboleth.net/schema/idp
 	<!-- ====================================== -->
 	<!-- Atributos para o Servico educast       -->
 	<!-- =====================================  -->
-	<AttributeFilterPolicy id="educast">
-		<PolicyRequirementRule xsi:type="AND">
-			<Rule xsi:type="OR">
-				<Rule xsi:type="Requester" value="https://educast.fccn.pt/shibboleth" />
-				<Rule xsi:type="Requester" value="https://educast.fccn.pt" />
-                <Rule xsi:type="Requester" value="https://recorder.educast.fccn.pt" />
-			</Rule>
+<AttributeFilterPolicy id="educast">
+   <PolicyRequirementRule xsi:type="AND">
+        <Rule xsi:type="OR">
+            <Rule xsi:type="Requester" value="https://educast.fccn.pt" />
+            <Rule xsi:type="Requester" value="https://educast.fccn.pt/shibboleth" />
+            <Rule xsi:type="Requester" value="https://recorder.educast.fccn.pt" />
+        </Rule>
 			<Rule xsi:type="NOT">
 				<Rule xsi:type="OR">
 					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
@@ -220,50 +275,13 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:afp http://shibboleth.net/schema/idp
 		</AttributeRule>
 	</AttributeFilterPolicy>
 	
-
-
-	 <!-- ====================================== -->
-        <!-- Atributos para o Servico RCTSaai-RR DEV   -->
-        <!-- =====================================  -->
-        <AttributeFilterPolicy id="rctsaai-rr.dev.fccn.pt">
-                <PolicyRequirementRule xsi:type="AND">
-                        <Rule xsi:type="Requester" value="https://rctsaai-rr.dev.fccn.pt" />
-                        <Rule xsi:type="NOT">
-                                <Rule xsi:type="OR">
-                                        <Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
-                                        <Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*authmonit.*"/>
-                                </Rule>
-                        </Rule>
-                </PolicyRequirementRule>
-                <AttributeRule attributeID="email">
-            <PermitValueRule xsi:type="ANY" />
-                </AttributeRule>
-                <AttributeRule attributeID="surname">
-            <PermitValueRule xsi:type="ANY" />
-                </AttributeRule>
-                <AttributeRule attributeID="givenName">
-            <PermitValueRule xsi:type="ANY" />
-                </AttributeRule>
-                <AttributeRule attributeID="eduPersonPrincipalName">
-            <PermitValueRule xsi:type="ANY" />
-                </AttributeRule>
-                <AttributeRule attributeID="eduPersonTargetedID">
-            <PermitValueRule xsi:type="ANY" />
-                </AttributeRule>
-        </AttributeFilterPolicy>
-
-
-
 	
 	<!-- ====================================== -->
 	<!-- Atributos para o eduroam               -->
 	<!-- =====================================  -->
 	<AttributeFilterPolicy id="eduroam.pt">
-		<PolicyRequirementRule xsi:type="AND">
-        	<Rule xsi:type="OR">
-				<Rule xsi:type="Requester" value="https://eduroam.pt/simplesaml/module.php/saml/sp/metadata.php/eduroam.pt" />
-				<Rule xsi:type="Requester" value="https://eduroam-dev.fccn.pt" />
-			</Rule>
+			<PolicyRequirementRule xsi:type="AND">
+			<Rule xsi:type="Requester" value="https://eduroam.pt/simplesaml/module.php/saml/sp/metadata.php/eduroam.pt" />
 			<Rule xsi:type="NOT">
 				<Rule xsi:type="OR">
 					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
@@ -301,10 +319,10 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:afp http://shibboleth.net/schema/idp
 		<PolicyRequirementRule xsi:type="AND">
 			<Rule xsi:type="Requester" value="http://shibboleth.ebscohost.com" />
 			<Rule xsi:type="NOT">
-			<!--	<Rule xsi:type="OR">
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/> -->
+				<Rule xsi:type="OR">
+					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
 					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*authmonit.*"/>
-			<!--	</Rule> -->
+				</Rule>
 			</Rule>
 		</PolicyRequirementRule>
         <AttributeRule attributeID="eduPersonScopedAffiliation">
@@ -495,6 +513,24 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:afp http://shibboleth.net/schema/idp
 		</PolicyRequirementRule>
 		<AttributeRule attributeID="eduPersonScopedAffiliation">
             <PermitValueRule xsi:type="ANY" />
+		</AttributeRule>
+	</AttributeFilterPolicy>
+	
+	<!-- ======================================  -->
+	<!-- Atributos para o Thomsonreuters         -->
+	<!-- ======================================  -->
+	<AttributeFilterPolicy id="https://sp.tshhosting.com/shibboleth">
+		<PolicyRequirementRule xsi:type="AND">
+			<Rule xsi:type="Requester" value="https://sp.tshhosting.com/shibboleth" />
+			<Rule xsi:type="NOT">
+				<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*authmonit.*"/>
+			</Rule>
+		</PolicyRequirementRule>
+		<AttributeRule attributeID="eduPersonScopedAffiliation">
+			<PermitValueRule xsi:type="ANY"/>
+		</AttributeRule>
+		<AttributeRule attributeID="eduPersonEntitlement">
+			<PermitValueRule xsi:type="ANY"/>
 		</AttributeRule>
 	</AttributeFilterPolicy>
 	
@@ -924,138 +960,6 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:afp http://shibboleth.net/schema/idp
 	</AttributeFilterPolicy>
 	
 	<!-- ====================================== -->
-	<!-- Atributos para o monitor.eduroam.pt    -->
-	<!-- =====================================  -->
-  	<AttributeFilterPolicy id="https://monitor.eduroam.org/sp/module.php/saml/sp/metadata.php/default-sp">
-		<PolicyRequirementRule xsi:type="AND">
-			<Rule xsi:type="Requester" value="https://monitor.eduroam.org/sp/module.php/saml/sp/metadata.php/default-sp" />
-			<Rule xsi:type="NOT">
-				<Rule xsi:type="OR">
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*authmonit.*"/>
-				</Rule>
-			</Rule>
-		</PolicyRequirementRule>	
-		<AttributeRule attributeID="email">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		<AttributeRule attributeID="displayName">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		<AttributeRule attributeID="eduPersonTargetedID">
-            <PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-	</AttributeFilterPolicy>
-	
-	<!-- ====================================== -->
-	<!-- Atributos para o eduroam-pre.fccn.pt   -->
-	<!-- =====================================  -->
-  	<AttributeFilterPolicy id="https://eduroam-pre.fccn.pt/simplesaml/module.php/saml/sp/metadata.php/eduroam-pre.fccn.pt">
-		<PolicyRequirementRule xsi:type="AND">
-			<Rule xsi:type="Requester" value="https://eduroam-pre.fccn.pt/simplesaml/module.php/saml/sp/metadata.php/eduroam-pre.fccn.pt" />
-			<Rule xsi:type="NOT">
-				<Rule xsi:type="OR">
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*authmonit.*"/>
-				</Rule>
-			</Rule>
-		</PolicyRequirementRule>
-        <AttributeRule attributeID="givenName">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		<AttributeRule attributeID="surname">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		<AttributeRule attributeID="displayName">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		<AttributeRule attributeID="email">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		<AttributeRule attributeID="eduPersonPrimaryAffiliation">
-            <PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		<AttributeRule attributeID="eduPersonPrincipalName">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-        <AttributeRule attributeID="organizationName">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-	</AttributeFilterPolicy>
-	
-	<!-- ====================================== -->
-	<!-- Atributos para o priv-extranet.fccn.pt -->
-	<!-- =====================================  -->
-  	<AttributeFilterPolicy id="https://priv-extranet.fccn.pt/simplesaml/module.php/saml/sp/metadata.php/priv-extranet.fccn.pt">
-		<PolicyRequirementRule xsi:type="AND">
-			<Rule xsi:type="Requester" value="https://priv-extranet.fccn.pt/simplesaml/module.php/saml/sp/metadata.php/priv-extranet.fccn.pt" />
-			<Rule xsi:type="NOT">
-				<Rule xsi:type="OR">
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*authmonit.*"/>
-				</Rule>
-			</Rule>
-		</PolicyRequirementRule>
-        <AttributeRule attributeID="givenName">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		<AttributeRule attributeID="surname">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		<AttributeRule attributeID="displayName">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		<AttributeRule attributeID="email">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		<AttributeRule attributeID="eduPersonPrimaryAffiliation">
-            <PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		<AttributeRule attributeID="eduPersonPrincipalName">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-        <AttributeRule attributeID="organizationName">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-	</AttributeFilterPolicy>
-	
-	<!-- ====================================== -->
-	<!-- Atributos para o pre-extranet.fccn.pt  -->
-	<!-- =====================================  -->
-  	<AttributeFilterPolicy id="https://pre-extranet.fccn.pt/simplesaml/module.php/saml/sp/metadata.php/pre-extranet.fccn.pt">
-		<PolicyRequirementRule xsi:type="AND">
-			<Rule xsi:type="Requester" value="https://pre-extranet.fccn.pt/simplesaml/module.php/saml/sp/metadata.php/pre-extranet.fccn.pt" />
-			<Rule xsi:type="NOT">
-				<Rule xsi:type="OR">
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*authmonit.*"/>
-				</Rule>
-			</Rule>
-		</PolicyRequirementRule>
-        <AttributeRule attributeID="givenName">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		<AttributeRule attributeID="surname">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		<AttributeRule attributeID="displayName">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		<AttributeRule attributeID="email">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		<AttributeRule attributeID="eduPersonPrimaryAffiliation">
-            <PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		<AttributeRule attributeID="eduPersonPrincipalName">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-        <AttributeRule attributeID="organizationName">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-	</AttributeFilterPolicy>
-	
-	<!-- ====================================== -->
 	<!-- Atributos para o Recorder              -->
 	<!-- =====================================  -->
   	<AttributeFilterPolicy id="https://recorder.educast.fccn.pt">
@@ -1279,206 +1183,6 @@ xsi:schemaLocation="urn:mace:shibboleth:2.0:afp http://shibboleth.net/schema/idp
 		<AttributeRule attributeID="sAMAccountName">
 			<PermitValueRule xsi:type="ANY" />
 		</AttributeRule>
-	</AttributeFilterPolicy>
-	
-	<!-- ==================================  -->
-	<!-- Atributos para o eudat FCCN         -->
-	<!-- ==================================  -->
-	<AttributeFilterPolicy id="https://eudat-b2access.fccn.pt:2443/unitygw/saml-sp-metadata/metadata-main">
-		<PolicyRequirementRule xsi:type="AND">
-			<Rule xsi:type="Requester" value="https://eudat-b2access.fccn.pt:2443/unitygw/saml-sp-metadata/metadata-main" />
-			<Rule xsi:type="NOT">
-				<Rule xsi:type="OR">
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*authmonit.*"/>
-				</Rule>
-			</Rule>
-		</PolicyRequirementRule>
-        <AttributeRule attributeID="email">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		<AttributeRule attributeID="commonName">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		<AttributeRule attributeID="eduPersonPrincipalName">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		<AttributeRule attributeID="transientId">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-	</AttributeFilterPolicy>
-	
-	
-	<AttributeFilterPolicy id="EnginePRD">
-		
-		<PolicyRequirementRule xsi:type="AND">
-			<Rule xsi:type="Requester" value="https://engine.rctsaai.pt/authentication/sp/metadata" />
-			<Rule xsi:type="NOT">
-				<Rule xsi:type="OR">
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*authmonit.*"/>
-				</Rule>
-			</Rule>
-		</PolicyRequirementRule>
-		
-		<AttributeRule attributeID="surname">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		
-		<AttributeRule attributeID="givenName">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		
-		<AttributeRule attributeID="commonName">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		
-		<AttributeRule attributeID="displayName">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		
-		<AttributeRule attributeID="email">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		
-		<AttributeRule attributeID="uid">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-				
-		<AttributeRule attributeID="schacHomeOrganization">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		
-		<AttributeRule attributeID="eduPersonAffiliation2">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		
-		<AttributeRule attributeID="eduPersonScopedAffiliation2">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		
-		<AttributeRule attributeID="eduPersonPrincipalName">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		
-	</AttributeFilterPolicy>
-	
-        <AttributeFilterPolicy id="EngineQUA">
-
-                <PolicyRequirementRule xsi:type="AND">
-                        <Rule xsi:type="Requester" value="https://engine.qua.rctsaai.pt/authentication/sp/metadata" />
-                        <Rule xsi:type="NOT">
-                                <Rule xsi:type="OR">
-                                        <Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
-                                        <Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*authmonit.*"/>
-                                </Rule>
-                        </Rule>
-                </PolicyRequirementRule>
-
-                <AttributeRule attributeID="surname">
-                        <PermitValueRule xsi:type="ANY" />
-                </AttributeRule>
-
-                <AttributeRule attributeID="givenName">
-                        <PermitValueRule xsi:type="ANY" />
-                </AttributeRule>
-
-                <AttributeRule attributeID="commonName">
-                        <PermitValueRule xsi:type="ANY" />
-                </AttributeRule>
-
-                <AttributeRule attributeID="displayName">
-                        <PermitValueRule xsi:type="ANY" />
-                </AttributeRule>
-
-                <AttributeRule attributeID="email">
-                        <PermitValueRule xsi:type="ANY" />
-                </AttributeRule>
-
-                <AttributeRule attributeID="uid">
-                        <PermitValueRule xsi:type="ANY" />
-                </AttributeRule>
-
-                <AttributeRule attributeID="schacHomeOrganization">
-                        <PermitValueRule xsi:type="ANY" />
-                </AttributeRule>
-
-                <AttributeRule attributeID="eduPersonAffiliation2">
-                        <PermitValueRule xsi:type="ANY"/>
-                </AttributeRule>
-
-                <AttributeRule attributeID="eduPersonScopedAffiliation2">
-                        <PermitValueRule xsi:type="ANY"/>
-                </AttributeRule>
-
-                <AttributeRule attributeID="eduPersonPrincipalName">
-                        <PermitValueRule xsi:type="ANY"/>
-                </AttributeRule>
-
-        </AttributeFilterPolicy>
-	
-	<AttributeFilterPolicy id="EngineDEV">
-		
-		<PolicyRequirementRule xsi:type="AND">
-			<Rule xsi:type="Requester" value="https://engine.dev.rctsaai.pt/authentication/sp/metadata" />
-			<Rule xsi:type="NOT">
-				<Rule xsi:type="OR">
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*teste.*"/>
-					<Rule xsi:type="ValueRegex"  attributeID="eduPersonPrincipalName" regex=".*authmonit.*"/>
-				</Rule>
-			</Rule>
-		</PolicyRequirementRule>
-		
-		<AttributeRule attributeID="uid">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		
-		<AttributeRule attributeID="schacHomeOrganization">
-			<PermitValueRule xsi:type="ANY" />
-		</AttributeRule>
-		
-		<AttributeRule attributeID="eduPersonAffiliation2">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		
-		<AttributeRule attributeID="eduPersonPrincipalName">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		
-<!--		<AttributeRule attributeID="eduPersonTargetedID">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
--->		
-		<AttributeRule attributeID="email">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		
-		<!-- either displayName or (givenName and sn) is REQUIRED but all three are RECOMMENDED -->
-		<AttributeRule attributeID="displayName">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		
-		<AttributeRule attributeID="givenName">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		
-		<AttributeRule attributeID="surname">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		
-		<!-- release of ePSA is OPTIONAL -->
-		<AttributeRule attributeID="eduPersonScopedAffiliation2">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>
-		
-<!--		<AttributeRule attributeID="isMemberOf">
-			<PermitValueRule xsi:type="ANY"/>
-		</AttributeRule>	
--->
-		<AttributeRule attributeID="eduPersonEntitlement">
-                        <PermitValueRule xsi:type="ANY"/>
-                </AttributeRule>
-	
 	</AttributeFilterPolicy>
 	
 </AttributeFilterPolicyGroup>
