@@ -21,6 +21,10 @@
 ##
 #set ($rpContext = $profileRequestContext.getSubcontext('net.shibboleth.idp.profile.context.RelyingPartyContext'))
 #set ($username = $authenticationContext.getSubcontext('net.shibboleth.idp.authn.context.UsernamePasswordContext', true).getUsername())
+#if (!$passwordPrincipals or $passwordPrincipals.isEmpty() or $authenticationContext.isAcceptable($passwordPrincipals))
+	#set ($Integer = 0)
+	#set ($maxAttempts = $Integer.parseInt($environment.getProperty("idp.captcha.maxAttempts", "1")))
+#end
 #set ($passwordEnabled = true)
 #set ($cmdEnabled = $environment.getProperty("idp.cmd.display", "true"))
 #set ($ServiceLogo = $environment.getProperty("idp.ServiceLogo.display", "true"))
@@ -138,6 +142,41 @@
 										</div>
 										<br>
 									</div>
+									$request.getSession().setAttribute("mf", 0)
+									#if ($authenticationErrorContext && ($authenticationErrorContext.getExceptions()))
+										#if ($request.getSession().getAttribute("mf")>0)
+											#set( $value = $request.getSession().getAttribute("mf")- 1 )
+											$request.getSession().setAttribute("mf",$value)
+											#elseif ($request.getSession().getAttribute("mf")==0)
+											<div id="recaptcha-wrap">
+												<div class="g-recaptcha" data-sitekey='$environment.getProperty("idp.captcha.recaptchaKey", "")' style='transform:scale(0.82);-webkit-transform-origin:0 0;'></div>
+											</div>
+											<script type="text/javascript">
+											var language = GetURLParameter('lang');
+											$(document).ready(function($) {				  
+												changeRecaptchaLanguage(language);
+												$('#loginForm').submit(function(event) {
+													/* Act on the event */
+													if(grecaptcha !== undefined){
+														if(grecaptcha.getResponse().length > 0)
+														{
+															return true;
+														}
+														$('#msgRecaptcha').show();
+														$('#btnLogin').html('#springMessageText("idp.login.login", "Login")');
+														return false;
+													}
+													else
+													{
+														return true;
+													}
+												});
+											});
+											</script>
+										#else
+											$request.getSession().setAttribute("mf", $maxAttempts)
+										#end
+									#end
 									#if ($passwordEnabled)
 									<div class="form-element-wrapper">
 										<label id="msgRecaptcha" class="form-element form-error" style="display:none">#springMessageText("idp.captcha.loginMessage","")</label>

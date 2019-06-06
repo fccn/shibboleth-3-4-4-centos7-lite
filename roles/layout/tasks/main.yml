@@ -27,8 +27,8 @@
     backup: yes
 
 - name: Copiar login.vm
-  template:
-    src: "{{ role_path }}/files/login.vm"
+  copy:
+    src: login.vm
     dest: /opt/shibboleth-idp/views/
     backup: yes
 
@@ -40,13 +40,13 @@
 
 - name: Copiar authn-messages.properties
   template:
-    src: "{{ role_path }}/files/authn-messages.properties"
+    src: "{{ role_path }}/templates/authn-messages.properties"
     dest: /opt/shibboleth-idp/messages/
     backup: yes
 
 - name: Copiar authn-messages_pt_PT.properties
   template:
-    src: "{{ role_path }}/files/authn-messages_pt_PT.properties"
+    src: "{{ role_path }}/templates/authn-messages_pt_PT.properties"
     dest: /opt/shibboleth-idp/messages/
     backup: yes
 
