@@ -58,8 +58,8 @@ ldap_type: sAMAccountName             # No caso de AD sAMAccountName, no caso de
 ##########################
 recaptcha_key: XXXXXXXXXXX
 
-IDP_VERSION: 3.4.3
-source_directory: /usr/local/dist/shibboleth-identity-provider-3.4.3
+IDP_VERSION: 3.4.4
+source_directory: /usr/local/dist/shibboleth-identity-provider-3.4.4
 installation_directory: /opt/shibboleth-idp
 hostname: idp.fccn.pt
 SAML_entityID: https://idp.fccn.pt/idp/shibboleth
