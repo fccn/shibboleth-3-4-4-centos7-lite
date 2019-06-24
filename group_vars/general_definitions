@@ -66,3 +66,14 @@ SAML_entityID: https://idp.fccn.pt/idp/shibboleth
 attribute_scope:  fccn.pt
 backchannel_PKCS12_password: password
 cookie_Encryption_key_password: password
+
+#
+# Links Shibboleth
+##########################
+link_suporte: https://confluence.fccn.pt/pages/viewpage.action?pageId=16810329
+link_rctsaai: https://confluence.fccn.pt/display/RCTSAAI/RCTSaai
+link_seguranca: https://confluence.fccn.pt/display/RCTSAAI/FAQ
+link_esqueceu_palavra_chave: https://www.fccn.pt
+idp_logo_url: https://www.fccn.pt
+idp_logo_img: /FCCN/images/fccn.pt.png
+idp_logo_alt: FCCN
