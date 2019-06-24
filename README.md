@@ -1,10 +1,10 @@
-# Instalação do Shibboleth 3.4.3 por Ansible
+# Instalação do Shibboleth 3.4.4 por Ansible
 
-Procedimento de utilização do pacote de Ansible para instalação do **Shibboleth 3.4.3**
+Procedimento de utilização do pacote de Ansible para instalação do **Shibboleth 3.4.4**
 
 ## [Pré-requisitos](#pre-requisitos) ##
 
-O primeiro passo a efectuar é instalar os pacotes ansible e *git* para obter o código de instalação do **Shibboleth 3.4.3** por código Ansible. 
+O primeiro passo a efectuar é instalar os pacotes ansible e *git* para obter o código de instalação do **Shibboleth 3.4.4** por código Ansible. 
 
 ```
 shell> yum -y install ansible git
@@ -13,13 +13,13 @@ shell> yum -y install ansible git
 Efectuar o download do código Ansible a partir do repositório *git*.
 
 ```
-shell> git clone https://gitlab.fccn.pt/dev-sid/shibboleth-3-4-3-centos7-org.git
+shell> git clone https://gitlab.fccn.pt/dev-sid/shibboleth-3-4-4-centos7-org.git
 ```
 
 Após ter-se efectuado o *download* do código, entre na nova pasta **shibboleth-3-4-3-centos7-org**:
 
 ```
-shell> cd shibboleth-3-4-3-centos7-org
+shell> cd shibboleth-3-4-4-centos7-org
 ```
 
 Editar o ficheiro de definições gerais sobre a instituição e da instalação em curso no seguinte ficheiro
@@ -76,8 +76,8 @@ ldap_type: sAMAccountName             # No caso de AD sAMAccountName, no caso de
 #
 # Configurações Shibboleth
 ##########################
-IDP_VERSION: 3.4.3
-source_directory: /usr/local/dist/shibboleth-identity-provider-3.4.3
+IDP_VERSION: 3.4.4
+source_directory: /usr/local/dist/shibboleth-identity-provider-3.4.4
 installation_directory: /opt/shibboleth-idp
 SAML_entityID: https://idp.fccn.pt/idp/shibboleth
 attribute_scope:  fccn.pt
@@ -112,7 +112,7 @@ A instalação do Shibboleth depende das parametrizações efectuadas no ficheir
 Após as configurações básicas do Ansible deve ser executado o *playbook* de instalação do Shibboleth da seguinte forma:
 
 ```
-[root@idp-server shibboleth-3-4-3-centos7-org]# ansible-playbook -i "localhost," --connection=local ~/shibboleth-3-4-3-centos7-org/main.yml
+[root@idp-server shibboleth-3-4-4-centos7-org]# ansible-playbook -i "localhost," --connection=local ~/shibboleth-3-4-4-centos7-org/main.yml
 ```
 
 PLAY [all] *****************************************************************************************
