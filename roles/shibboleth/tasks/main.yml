@@ -43,6 +43,7 @@
   -Didp.merge.properties=/templates/idp.merge.properties \
   -Didp.src.dir=/usr/local/dist/shibboleth-identity-provider-{{ IDP_VERSION }} \
   -Didp.target.dir={{ installation_directory }} \
+  -Didp.entityID={{ SAML_entityID }} \
   -Didp.scope={{ attribute_scope }} \
   -Didp.host.name={{ server_name }} \
   -Didp.sealer.password={{ var_sealer_string.stdout }} \
