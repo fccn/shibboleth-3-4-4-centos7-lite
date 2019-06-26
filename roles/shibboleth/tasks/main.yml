@@ -114,6 +114,11 @@
     state: absent
     regexp: '^\s*$'
 
+- name: copiar web.xml
+  copy:
+    src: "{{ role_path }}/files/web.xml"
+    dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/web.xml"
+
 - name: Recriar o arquivo idp.war
   shell: JAVACMD=/usr/bin/java /opt/shibboleth-idp/bin/build.sh -Didp.target.dir=/opt/shibboleth-idp
   register: shell_output
