@@ -318,20 +318,20 @@
 - name: mover para pasta old os certificados nao utilizados - idp-signing.key
   command: mv /opt/shibboleth-idp/credentials/idp-signing.key /opt/shibboleth-idp/credentials/old/idp-signing.key
 
-- name: mover para pasta old os certificados nao utilizados - idp-encryption.ke
-  command: mv /opt/shibboleth-idp/credentials/idp-encryption.key /opt/shibboleth-idp/credentials/old/idp-encryption.key
+#- name: mover para pasta old os certificados nao utilizados - idp-encryption.key
+#  command: mv /opt/shibboleth-idp/credentials/idp-encryption.key /opt/shibboleth-idp/credentials/old/idp-encryption.key
 
-- name: mover para pasta old os certificados nao utilizados - idp-backchannel.p12
-  command: mv /opt/shibboleth-idp/credentials/idp-backchannel.p12 /opt/shibboleth-idp/credentials/old/idp-backchannel.p12
+#- name: mover para pasta old os certificados nao utilizados - idp-backchannel.p12
+#  command: mv /opt/shibboleth-idp/credentials/idp-backchannel.p12 /opt/shibboleth-idp/credentials/old/idp-backchannel.p12
 
 - name: mover para pasta old os certificados nao utilizados - idp-signing.crt
   command: mv /opt/shibboleth-idp/credentials/idp-signing.crt /opt/shibboleth-idp/credentials/old/idp-signing.crt
 
-- name: mover para pasta old os certificados nao utilizados - idp-encryption.crt
-  command: mv /opt/shibboleth-idp/credentials/idp-encryption.crt /opt/shibboleth-idp/credentials/old/idp-encryption.crt
+#- name: mover para pasta old os certificados nao utilizados - idp-encryption.crt
+#  command: mv /opt/shibboleth-idp/credentials/idp-encryption.crt /opt/shibboleth-idp/credentials/old/idp-encryption.crt
 
-- name: mover para pasta old os certificados nao utilizados - idp-backchannel.crt
-  command: mv /opt/shibboleth-idp/credentials/idp-backchannel.crt /opt/shibboleth-idp/credentials/old/idp-backchannel.crt
+#- name: mover para pasta old os certificados nao utilizados - idp-backchannel.crt
+#  command: mv /opt/shibboleth-idp/credentials/idp-backchannel.crt /opt/shibboleth-idp/credentials/old/idp-backchannel.crt
 
 - name: chown tomcat na directoria shibboleth
   command: chown -R tomcat:tomcat /opt/shibboleth-idp/

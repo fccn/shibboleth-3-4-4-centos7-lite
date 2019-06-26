@@ -17,6 +17,12 @@
     group: root
     dest: /usr/local/dist/
 
+- name: copiar build.xml
+  copy:
+    src: "{{ role_path }}/files/build.xml"
+    dest: "{{ source_directory }}/bin/build.xml"
+    backup: yes
+
 - name: Validar se ja existe uma instalacao de Shibboleth
   stat: path=/opt/shibboleth-idp
   register: shibboleth_exists
@@ -46,8 +52,8 @@
   -Didp.entityID={{ SAML_entityID }} \
   -Didp.scope={{ attribute_scope }} \
   -Didp.host.name={{ server_name }} \
-  -Didp.sealer.password={{ var_sealer_string.stdout }} \
   -Didp.keystore.password={{ cookie_Encryption_key_password }} \
+  -Didp.sealer.password={{ var_sealer_string.stdout }} \
   -Didp.noprompt=true"
   args:
     executable: /bin/bash
@@ -88,6 +94,25 @@
     line: 'idp.sealer.password = {{ var_sealer_string.stdout }}'
     state: present
 
+- name: remover use signing no key descriptor da metadata (para usar o mesmo certificado para assinar e cifrar)
+  replace:
+    path: /opt/shibboleth-idp/metadata/idp-metadata.xml
+    regexp: '<KeyDescriptor use="signing">'
+    replace: '<KeyDescriptor>'
+
+- name: remover bloco Authority Attribute Descriptor na metadata
+  replace:
+    path: /opt/shibboleth-idp/metadata/idp-metadata.xml
+    after: '</IDPSSODescriptor>'
+    before: '</EntityDescriptor>'
+    regexp: '^(.*?)$'
+    replace: ' '
+
+- name: remove linhas sem conteudo no ficheiro de metadata
+  lineinfile:
+    path: /opt/shibboleth-idp/metadata/idp-metadata.xml
+    state: absent
+    regexp: '^\s*$'
 
 - name: Recriar o arquivo idp.war
   shell: JAVACMD=/usr/bin/java /opt/shibboleth-idp/bin/build.sh -Didp.target.dir=/opt/shibboleth-idp
