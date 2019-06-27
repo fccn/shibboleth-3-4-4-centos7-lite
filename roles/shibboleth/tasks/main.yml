@@ -12,7 +12,7 @@
 
 - name: Descomprimir arquivo do Shibboleth
   unarchive:
-    src: "{{ role_path }}/files/shibboleth-identity-provider-{{ IDP_VERSION }}.tar.gz"
+    src: "{{ role_path }}/files/shibboleth-identity-provider-{{ idp_version }}.tar.gz"
     owner: root
     group: root
     dest: /usr/local/dist/
@@ -45,14 +45,14 @@
 - set_fact: var_java_home="/usr/lib/jvm/{{ java_best_path.stdout }}"
 
 - name: Executar a instalacao do Shibboleth
-  shell: "/usr/local/dist/shibboleth-identity-provider-{{ IDP_VERSION }}/bin/install.sh \
+  shell: "/usr/local/dist/shibboleth-identity-provider-{{ idp_version }}/bin/install.sh \
   -Didp.merge.properties=/templates/idp.merge.properties \
-  -Didp.src.dir=/usr/local/dist/shibboleth-identity-provider-{{ IDP_VERSION }} \
+  -Didp.src.dir=/usr/local/dist/shibboleth-identity-provider-{{ idp_version }} \
   -Didp.target.dir={{ installation_directory }} \
-  -Didp.entityID={{ SAML_entityID }} \
+  -Didp.entityID='https://{{ server_name }}/idp/shibboleth' \
   -Didp.scope={{ attribute_scope }} \
   -Didp.host.name={{ server_name }} \
-  -Didp.keystore.password={{ cookie_Encryption_key_password }} \
+  -Didp.keystore.password=password \
   -Didp.sealer.password={{ var_sealer_string.stdout }} \
   -Didp.noprompt=true"
   args:

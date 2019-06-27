@@ -16,7 +16,7 @@ Efectuar o download do código Ansible a partir do repositório *git*.
 shell> git clone https://gitlab.fccn.pt/dev-sid/shibboleth-3-4-4-centos7-org.git
 ```
 
-Após ter-se efectuado o *download* do código, entre na nova pasta **shibboleth-3-4-3-centos7-org**:
+Após ter-se efectuado o *download* do código, entre na nova pasta **shibboleth-3-4-4-centos7-org**:
 
 ```
 shell> cd shibboleth-3-4-4-centos7-org
@@ -112,7 +112,7 @@ A instalação do Shibboleth depende das parametrizações efectuadas no ficheir
 Após as configurações básicas do Ansible deve ser executado o *playbook* de instalação do Shibboleth da seguinte forma:
 
 ```
-[root@idp-server shibboleth-3-4-4-centos7-org]# ansible-playbook -i "localhost," --connection=local ~/shibboleth-3-4-4-centos7-org/main.yml
+[root@idp-server shibboleth-3-4-4-centos7-org]# ansible-playbook -i "localhost," --connection=local main.yml
 ```
 
 PLAY [all] *****************************************************************************************
@@ -233,10 +233,10 @@ Após a execução do código Ansible é necessário actualizar o layout das pag
 
 ## Finalizar ##
 
-No final das configurações se pretender limpar os ficheiros auxiliares colocados no servidor, pode apagar a pasta **shibboleth-3-4-3-centos7** que contem o respositorio git assim como os pacotes de sistema operativo git e ansible.
+No final das configurações se pretender limpar os ficheiros auxiliares colocados no servidor, pode apagar a pasta **shibboleth-3-4-4-centos7** que contem o respositorio git assim como os pacotes de sistema operativo git e ansible.
 
 ```
-shell> rm -rf shibboleth-3-4-3-centos7/
+shell> rm -rf shibboleth-3-4-4-centos7-org/
 shell>  yum remove ansible git
 Loaded plugins: fastestmirror
 Resolving Dependencies
