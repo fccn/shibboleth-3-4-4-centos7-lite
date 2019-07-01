@@ -13,13 +13,13 @@ shell> yum -y install ansible git
 Efectuar o download do código Ansible a partir do repositório *git*.
 
 ```
-shell> git clone https://gitlab.fccn.pt/dev-sid/shibboleth-3-4-4-centos7-org.git
-```
+shell> git clone https://gitlab.fccn.pt/dev-sid/shibboleth-3-4-4-centos7-lite.git
 
-Após ter-se efectuado o *download* do código, entre na nova pasta **shibboleth-3-4-4-centos7-org**:
+
+Após ter-se efectuado o *download* do código, entre na nova pasta **shibboleth-3-4-4-centos7-lite**:
 
 ```
-shell> cd shibboleth-3-4-4-centos7-org
+shell> cd shibboleth-3-4-4-centos7-lite
 ```
 
 Editar o ficheiro de definições gerais sobre a instituição e da instalação em curso no seguinte ficheiro
@@ -236,7 +236,7 @@ Após a execução do código Ansible é necessário actualizar o layout das pag
 No final das configurações se pretender limpar os ficheiros auxiliares colocados no servidor, pode apagar a pasta **shibboleth-3-4-4-centos7** que contem o respositorio git assim como os pacotes de sistema operativo git e ansible.
 
 ```
-shell> rm -rf shibboleth-3-4-4-centos7-org/
+shell> rm -rf shibboleth-3-4-4-centos7-lite/
 shell>  yum remove ansible git
 Loaded plugins: fastestmirror
 Resolving Dependencies
