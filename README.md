@@ -111,9 +111,11 @@ A instalação do Shibboleth depende das parametrizações efectuadas no ficheir
 
 Após as configurações básicas do Ansible deve ser executado o *playbook* de instalação do Shibboleth da seguinte forma:
 
+
 ```
-[root@idp-server shibboleth-3-4-4-centos7-org]# ansible-playbook -i "localhost," --connection=local main.yml
+[root@idp-server shibboleth-3-4-4-centos7-lite]# ansible-playbook -i "localhost," --connection=local main.yml
 ```
+
 
 PLAY [all] *****************************************************************************************
 TASK [Gathering Facts] *****************************************************************************
