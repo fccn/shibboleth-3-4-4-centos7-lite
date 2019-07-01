@@ -1,0 +1,101 @@
+---
+
+- include_vars: group_vars/general_definitions
+
+- name: Copiar o ficheiro general-authn.xml
+  copy:
+    src: "{{ role_path }}/files/general-authn.xml"
+    dest: /opt/shibboleth-idp/conf/authn/
+    backup: yes
+
+- name: Copiar o ficheiro password-authn-config.xml
+  copy:
+    src: "{{ role_path }}/files/password-authn-config.xml"
+    dest: /opt/shibboleth-idp/conf/authn/
+    backup: yes
+
+- name: Criar pasta ../flows/authn/CC
+  file:
+    path: /opt/shibboleth-idp/flows/authn/CC
+    state: directory
+    owner: root
+    group: root
+
+- name: Copiar o ficheiro CC-authn-beans.xml
+  copy:
+    src: "{{ role_path }}/files/CC-authn-beans.xml"
+    dest: /opt/shibboleth-idp/flows/authn/CC/
+    backup: yes
+
+- name: Copiar o ficheiro CC-authn-flow.xml
+  copy:
+    src: "{{ role_path }}/files/CC-authn-flow.xml"
+    dest: /opt/shibboleth-idp/flows/authn/CC/
+    backup: yes
+
+- name: Copiar o ficheiro cc-authn-config.xml
+  copy:
+    src: "{{ role_path }}/files/CC-authn-config.xml"
+    dest: /opt/shibboleth-idp/conf/authn/
+    backup: yes
+
+- name: Copiar o ficheiro CCExternalAuthServlet.class
+  copy:
+    src: /opt/shibboleth-idp/dist/webapp/WEB-INF/web.xml
+    dest: /opt/shibboleth-idp/edit-webapp/WEB-INF/
+
+#- name: Insertservlet and contxt-params in web.xml
+#  blockinfile:
+#    path: /opt/shibboleth-idp/edit-webapp/WEB-INF/web.xml
+#    insertafter: "</servlet>"
+#    block: |
+#      <servlet>
+#      <servlet-name>CCExternalAuthHandler</servlet-name>
+#      <servlet-class>CCExternalAuthServlet</servlet-class>
+#      <load-on-startup>4</load-on-startup>
+#      </servlet>
+#      <servlet-mapping>
+#      <servlet-name>CCExternalAuthHandler</servlet-name>
+#      <url-pattern>/Authn/External/CC</url-pattern>
+#      </servlet-mapping>
+
+#- name: Insertservlet and contxt-params in web.xml
+#  blockinfile:
+#    path: /opt/shibboleth-idp/edit-webapp/WEB-INF/web.xml
+#    insertafter: "</<context-param>"
+#    block: |
+#      <context-param>
+#      <param-name>idp.base</param-name>
+#      <param-value>/opt/shibboleth-idp</param-value>
+#      </context-param>
+
+- name: Copiar o ficheiro CCExternalAuthServlet.class
+  copy:
+    src: "{{ role_path }}/files/CCExternalAuthServlet.class"
+    dest: /opt/shibboleth-idp/edit-webapp/WEB-INF/classes/
+    backup: yes
+
+- name: Copiar pacote lib 
+  unarchive:
+    src: "{{ role_path }}/files/lib.zip"
+    dest: /opt/shibboleth-idp/edit-webapp/WEB-INF/
+
+- name: Criar o certificado p12 
+  expect:
+    command: openssl pkcs12 -export -in {{ path_ssl_cc_cert_file }} -inkey {{ path_ssl_cc_cert_key_file }} -out login-dev-fa_ciencia-id_pt.p12 -name {{ keystore_alias }} -CAfile {{ path_ssl_cc_cert_chain_file }}
+    responses:
+      "Enter pass.*": "{{ keystore_password }}"
+      "Enter Export .*": "{{ keystore_password }}"
+      "Verifying.*": "{{ keystore_password }}"
+    timeout: 30
+    echo: yes
+  register: output_cmd
+
+- name: Importar certificado para keystore
+  shell: keytool -importkeystore  -deststorepass {{ keystore_password }} -destkeypass {{ keystore_password }} -destkeystore {{ keystore_location }} -srckeystore login-dev-fa_ciencia-id_pt.p12 -srcstoretype PKCS12 -srcstorepass {{ keystore_password }} -alias {{ keystore_alias }}
+  register: shell_output
+
+- name: Recriar o arquivo idp.war
+  shell: JAVACMD=/usr/bin/java /opt/shibboleth-idp/bin/build.sh -Didp.target.dir=/opt/shibboleth-idp
+  register: shell_output
+  notify: restart tomcat

@@ -25,11 +25,11 @@
               state=present
 
 
-- name: copiar subject-c14n.xml
-  copy:
-    src: "{{ role_path }}/templates/subject-c14n.xml"
-    dest: /opt/shibboleth-idp/conf/c14n/
-    backup: yes
+#- name: copiar subject-c14n.xml
+#  copy:
+#    src: "{{ role_path }}/templates/subject-c14n.xml"
+#    dest: /opt/shibboleth-idp/conf/c14n/
+#    backup: yes
 
 - name: Gerar string de SALT
   shell: openssl rand -base64 36
@@ -39,12 +39,12 @@
 
 # - debug: var=var_salt_string
 
-- name: Adicionar LDAP configs [credentials.properties]
-  lineinfile:
-    dest: /opt/shibboleth-idp/conf/credentials.properties
-    insertbefore: BOF
-    line: 'idp.authn.LDAP.bindDNCredential = {{ ldap_password }}'
-    state: present
+#- name: Adicionar LDAP configs [credentials.properties]
+#  lineinfile:
+#    dest: /opt/shibboleth-idp/conf/credentials.properties
+#    insertbefore: BOF
+#    line: 'idp.authn.LDAP.bindDNCredential = {{ ldap_password }}'
+#    state: present
 
 - name: Adicionar SALT no ficheiro [credentials.properties]
   lineinfile:
@@ -64,11 +64,11 @@
 
 - debug: var=shell_output.stdout
 
-- name: Mudar regras de acesso
-  lineinfile: dest=/opt/shibboleth-idp/conf/access-control.xml
-              regexp='\s*p:(allowedRanges)=.*'
-              line='p:allowedRanges="#{ {\'127.0.0.1/32\', \'::1/128\' , \'{{ ip_range_access_control }}\',\'2001:690:2080:8009::/64\' } }" />'
-              state=present
+#- name: Mudar regras de acesso
+#  lineinfile: dest=/opt/shibboleth-idp/conf/access-control.xml
+#              regexp='\s*p:(allowedRanges)=.*'
+#              line='p:allowedRanges="#{ {\'127.0.0.1/32\', \'::1/128\' , \'{{ ip_range_access_control }}\',\'2001:690:2080:8009::/64\' } }" />'
+#              state=present
 
 - name: Criar pasta no shibboleth para config de [Large Objects]
   file: dest=/opt/shibboleth-idp/edit-webapp/WEB-INF/classes/META-INF state=directory recurse=yes mode=0644
@@ -129,12 +129,12 @@
 
 - debug: var=shell_output.stdout
 
-- name: Configuração services.xml
-  template:
-    src: services.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: Configuração services.xml
+#  template:
+#    src: services.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
 - name: Configuração idp.properties
   template:
@@ -149,103 +149,103 @@
     dest: /opt/shibboleth-idp/conf/
     mode: 0644
 
-- name: Copiar ficheiro de configuracao de metadata rctsaai
-  template:
-    src: metadata-provider-rctsaai.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: Copiar ficheiro de configuracao de metadata rctsaai
+#  template:
+#    src: metadata-provider-rctsaai.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
-- name: Copiar ficheiro de configuracao de metadata aaitest
-  template:
-    src: metadata-provider-aaitest.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: Copiar ficheiro de configuracao de metadata aaitest
+#  template:
+#    src: metadata-provider-aaitest.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
-- name: Copiar ficheiro de configuracao de metadata 
-  template:
-    src: metadata-provider-interfederation.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: Copiar ficheiro de configuracao de metadata 
+#  template:
+#    src: metadata-provider-interfederation.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
-- name: Copiar ficheiro de configuracao de metadata clarin
-  template:
-    src: metadata-provider-clarin.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: Copiar ficheiro de configuracao de metadata clarin
+#  template:
+#    src: metadata-provider-clarin.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
-- name: Copiar ficheiro de configuracao de metadata openconext QUA
-  template:
-    src: metadata-provider-engine-qua-rctsaai.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: Copiar ficheiro de configuracao de metadata openconext QUA
+#  template:
+#    src: metadata-provider-engine-qua-rctsaai.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
-- name: Copiar ficheiro de configuracao de metadata openconext
-  template:
-    src: metadata-provider-engine-rctsaai.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: Copiar ficheiro de configuracao de metadata openconext
+#  template:
+#    src: metadata-provider-engine-rctsaai.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
-- name: Copiar ficheiro de configuracao de metadata
-  template:
-    src: metadata-provider-engine-rctsaai-fccn.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: Copiar ficheiro de configuracao de metadata
+#  template:
+#    src: metadata-provider-engine-rctsaai-fccn.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
-- name: Copiar ficheiros de resolver connectors do shibboleth
-  template:
-    src: attribute-resolver-connectors.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: Copiar ficheiros de resolver connectors do shibboleth
+#  template:
+#    src: attribute-resolver-connectors.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
-- name: copiar ficheiro attribute resolver rctsaai 
-  template:
-    src: attribute-resolver-rctsaai-core.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: copiar ficheiro attribute resolver rctsaai 
+#  template:
+#    src: attribute-resolver-rctsaai-core.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
-- name: copiar ficheiro attribute resolver ldap
-  template:
-    src: attribute-resolver-ldap.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: copiar ficheiro attribute resolver ldap
+#  template:
+#    src: attribute-resolver-ldap.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
-- name: copiar ficheiro attribute resolver interfederation
-  template:
-    src: attribute-resolver-interfederation-core.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: copiar ficheiro attribute resolver interfederation
+#  template:
+#    src: attribute-resolver-interfederation-core.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
-- name: Copiar ficheiro atribute-filter
-  template:
-    src: attribute-filter.xml
-    dest: /opt/shibboleth-idp/conf/
-    mode: 0644
-    backup: yes
+#- name: Copiar ficheiro atribute-filter
+#  template:
+#    src: attribute-filter.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    mode: 0644
+#    backup: yes
 
-- name: Copiar context-check-intercept-config
-  template:
-    src: context-check-intercept-config.xml
-    dest: /opt/shibboleth-idp/conf/intercept/
-    mode: 0644
-    backup: yes
+#- name: Copiar context-check-intercept-config
+#  template:
+#    src: context-check-intercept-config.xml
+#    dest: /opt/shibboleth-idp/conf/intercept/
+#    mode: 0644
+#    backup: yes
 
-- name: Copiar attribute-sourced-subject-c14n-config
-  template:
-    src: attribute-sourced-subject-c14n-config.xml
-    dest: /opt/shibboleth-idp/conf/intercept/
-    mode: 0644
-    backup: yes
+#- name: Copiar attribute-sourced-subject-c14n-config
+#  template:
+#    src: attribute-sourced-subject-c14n-config.xml
+#    dest: /opt/shibboleth-idp/conf/intercept/
+#    mode: 0644
+#    backup: yes
 
 - name: Copiar ficheiro de ligação a base de dados PostgreSQL shibboleth
   template:
@@ -262,28 +262,28 @@
     mode: 0644
 
 
-- name: Configuração da Autenticação - LDAP
-  template:
-    src: ldap.properties
-    dest: /opt/shibboleth-idp/conf/
-    backup: yes
-    mode: 0644
+#- name: Configuração da Autenticação - LDAP
+#  template:
+#    src: ldap.properties
+#    dest: /opt/shibboleth-idp/conf/
+#    backup: yes
+#    mode: 0644
 
 
-- name: Activar a visualização dos "Termos e Condições de Utilização" e o "User Consent"
-  template:
-    src: relying-party.xml
-    dest: /opt/shibboleth-idp/conf/
-    backup: yes
-    mode: 0644
+#- name: Activar a visualização dos "Termos e Condições de Utilização" e o "User Consent"
+#  template:
+#    src: relying-party.xml
+#    dest: /opt/shibboleth-idp/conf/
+#    backup: yes
+#    mode: 0644
 
 
-- name: Atualizar o consent-intercept-config
-  template:
-    src: consent-intercept-config.xml
-    dest: /opt/shibboleth-idp/conf/intercept/
-    backup: yes
-    mode: 0644
+#- name: Atualizar o consent-intercept-config
+#  template:
+#    src: consent-intercept-config.xml
+#    dest: /opt/shibboleth-idp/conf/intercept/
+#    backup: yes
+#    mode: 0644
 
 
 - name: Configuração para a rotação periódica de chaves
@@ -336,10 +336,10 @@
 - name: chown tomcat na directoria shibboleth
   command: chown -R tomcat:tomcat /opt/shibboleth-idp/
 
-- name: Copiar pacote credentials 
-  unarchive:
-    src: "{{ role_path }}/files/credentials.zip"
-    dest: /opt/shibboleth-idp/credentials/
+#- name: Copiar pacote credentials 
+#  unarchive:
+#    src: "{{ role_path }}/files/credentials.zip"
+#    dest: /opt/shibboleth-idp/credentials/
 
 - name: Recarregar serviços do SystemCTL
   systemd:
