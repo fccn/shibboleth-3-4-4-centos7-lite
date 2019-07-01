@@ -130,7 +130,7 @@
   lineinfile: dest=~/.bash_profile
               state=present
               insertbefore='^PATH='
-              line='\nexport IDP_SRC=/usr/local/src/shibboleth-identity-provider-{{ IDP_VERSION }}\n'
+              line='\nexport IDP_SRC=/usr/local/src/shibboleth-identity-provider-{{ idp_version }}\n'
   when: idp_src_home_exists.stdout == "0"
 
 - name: Verificar alias
