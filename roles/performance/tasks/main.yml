@@ -1,6 +1,7 @@
 ---
 
-- include_vars: group_vars/general_definitions
+# In future this should be included directly on main.yml instead on each role.
+#- include_vars: group_vars/general_definitions
 
 #- name: Validar a existencia de jarsToSkip no ficheiro catalina.properties
 #  shell: grep -c catalina.properties /opt/tomcat/conf/catalina.properties

@@ -1,6 +1,7 @@
 ---
 
-- include_vars: group_vars/general_definitions
+# In future this should be included directly on main.yml instead on each role.
+#- include_vars: group_vars/general_definitions
 
 - name: Actualizar saml-nameid.xml
   template: src=saml-nameid.xml dest=/opt/shibboleth-idp/conf/saml-nameid.xml mode=0644

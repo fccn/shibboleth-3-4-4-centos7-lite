@@ -1,6 +1,7 @@
 ---
 
-- include_vars: group_vars/general_definitions
+# In future this should be included directly on main.yml instead on each role.
+#- include_vars: group_vars/general_definitions
 
 #- name: Rename ssl.conf para z_ssl.conf
 #  command: mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/z_ssl.conf

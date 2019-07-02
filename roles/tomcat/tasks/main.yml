@@ -1,6 +1,7 @@
 ---
 
-- include_vars: group_vars/general_definitions
+# In future this should be included directly on main.yml instead on each role.
+#- include_vars: group_vars/general_definitions
 
 - name: Validar se já existe um Tomcat no destino
   stat: path=/opt/tomcat
