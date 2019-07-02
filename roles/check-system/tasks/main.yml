@@ -3,6 +3,11 @@
 # In future this should be included directly on main.yml instead on each role.
 #- include_vars: group_vars/general_definitions
 
+# some systems require yum-utils
+- name: Some systems require install the yum-utils package to use yum list
+  package:
+    name: yum-utils
+
 #
 # validar versão do CentOS
 ##########################
