@@ -26,9 +26,9 @@
 - debug: var=postgresql_iniciated.stat.exists
 
 # So tenta recriar a base de dados PostgreSQL no caso de nao ter sido criado
-- name: Iniciar base de dados do PostgreSQL
-  shell: /usr/bin/postgresql-setup initdb
-  when: postgresql_iniciated.stat.exists
+#- name: Iniciar base de dados do PostgreSQL
+#  shell: /usr/bin/postgresql-setup initdb
+#  when: postgresql_iniciated.stat.exists
 
 - name: Restart PostgreSQL
   systemd:

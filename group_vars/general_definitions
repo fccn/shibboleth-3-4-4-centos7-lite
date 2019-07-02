@@ -1,16 +1,34 @@
 #
 # Configurações Apache
 ######################
-organization_domain: fccn.pt
-server_name: idp.fccn.pt
-server_admin: idp-admin@fccn.pt
+organization_domain: stage.nau.edu.pt
+server_name: cc.sp.stage.nau.edu.pt
+server_admin: equipa@nau.edu.pt
 
 #
 # Certificados digitais
 #######################
-path_ssl_cert_key_file: /etc/pki/tls/private/XXXXXXXX.key
-path_ssl_cert_file: /etc/pki/tls/certs/idp/XXXXXXXXXXX.crt
+path_ssl_cert_key_file: /etc/pki/tls/private/cc_sp_stage_nau_edu_pt.key
+path_ssl_cert_file: /etc/pki/tls/certs/idp/cc_sp_stage_nau_edu_pt.crt
 path_ssl_cert_chain_file: /etc/pki/tls/certs/idp/DigiCertCA.crt
+
+#
+# Configurações CC_CMD
+######################
+keystore_password: dsadhu34536SDS
+keystore_location: /etc/pki/ca-trust/extracted/java/ccidpnau
+keystore_alias: ccidpnau
+external_issuer: cc.sp.stage.nau.edu.pt
+external_ama: https://autenticacao.gov.pt/fa/Default.aspx
+#external_provider_name: FundaÃ§ para a CiÃªia e a Tecnologia
+external_provider_name: FCT
+
+#
+#p12 CC_CMD
+path_ssl_cc_cert_key_file: /opt/certificados_cc_2019/cc_sp_stage_nau_edu_pt.key
+path_ssl_cc_cert_file: /opt/certificados_cc_2019/cc_sp_stage_nau_edu_pt.crt
+path_ssl_cc_cert_chain_file: /opt/certificados_cc_2019/cc_sp_stage_nau_edu_pt_chain.crt
+
 
 #
 # Configurações de Base de Dados
@@ -19,7 +37,8 @@ postgresql_backup_dest: /var/lib/pgsql/backups
 #
 # Configurações Tomcat
 ######################
-tomcat_version: 9.0.16 #Não alterar
+#tomcat_version: 8.5.38
+tomcat_version: 9.0.16
 tomcat_xms: 512M
 tomcat_xmx: 3072M
 
@@ -28,25 +47,29 @@ tomcat_xmx: 3072M
 ##########################
 ip_range_access_control: '0.0.0.0/0'  # Tem de estar obrigatoriamente entre 'plicas'
 idp_metadata: rctsaai,rctsaai-engine,interfederation                 # No caso de testes aaitest, caso de produção rctsaai
-ldap_url: XXXXXXXX              # Pode ser o endereco IP ou o FQDN do servidor da AD ou LDAP server
-ldap_dn_format: dc=corp,dc=fccn,dc=pt
-ldap_port: XXXXXXXX               # Porto de ligação à AD ou LDAP (standart 389)
-ldap_username: XXXXXXXX
-ldap_password: XXXXXXXX
-ldap_type: sAMAccountName             # No caso de AD sAMAccountName, no caso de LDAP uid
-
-idp_version: 3.4.4
-source_directory: /usr/local/dist/shibboleth-identity-provider-3.4.4 #Não alterar
-installation_directory: /opt/shibboleth-idp #Não alterar
-attribute_scope:  fccn.pt
 
 #
-# Links Shibboleth
+# Configurações ldap
+#######################
+#ldap_url: XXXXXXXX              # Pode ser o endereco IP ou o FQDN do servidor da AD ou LDAP server
+#ldap_dn_format: dc=corp,dc=fccn,dc=pt
+#ldap_port: XXXXXXXX               # Porto de ligação à AD ou LDAP (standart 389)
+#ldap_username: XXXXXXXX
+#ldap_password: XXXXXXXX
+#ldap_type: sAMAccountName             # No caso de AD sAMAccountName, no caso de LDAP uid
+
+#
+# Configurações Recaptcha
 ##########################
-link_suporte: https://confluence.fccn.pt/pages/viewpage.action?pageId=16810329
-link_rctsaai: https://confluence.fccn.pt/display/RCTSAAI/RCTSaai
-link_seguranca: https://confluence.fccn.pt/display/RCTSAAI/FAQ
-link_esqueceu_palavra_chave: https://www.fccn.pt
-idp_logo_url: https://www.fccn.pt
-idp_logo_img: /FCCN/images/fccn.pt.png
-idp_logo_alt: FCCN
+recaptcha_key: XXXXXXXXXXX
+
+idp_version: 3.4.4
+source_directory: /usr/local/dist/shibboleth-identity-provider-3.4.4
+installation_directory: /opt/shibboleth-idp
+hostname: cc.sp.stage.nau.edu.pt
+SAML_entityID: https://cc.sp.stage.nau.edu.pt/idp/shibboleth
+attribute_scope: cc.sp.stage.nau.edu.pt
+backchannel_PKCS12_password: 123456.
+cookie_Encryption_key_password: 123456.
+
+
