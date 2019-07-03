@@ -29,7 +29,7 @@
 # inspired by https://github.com/geerlingguy/ansible-role-postgresql/blob/master/tasks/initialize.yml
 - name: Check if PostgreSQL database is initialized.
   stat:
-    path: "/var/lib/pgsql/data/PG_VERSION"
+    path: /var/lib/pgsql/data/PG_VERSION
   register: postgresql_dir_version
 
 # So tenta recriar a base de dados PostgreSQL no caso de nao ter sido criado

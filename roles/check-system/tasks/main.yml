@@ -22,12 +22,14 @@
   yum:
     list: java-1.7.*-openjdk.*
   register: old_java_version
+  when: not ansible_check_mode
 
 # - debug: var=old_java_version.results[0].yumstate
 
 - name: Check Java 7 instalado?
   fail: msg="ATENÇÃO, Java openjdk 1.7 já instalado!!! É altamente recomendado que a máquina não tenho tido qualuqer instalação de java inferior a à versão 1.8 previamente. É muito provavel que a instalação irá falhar no final!"
   when: old_java_version.results[0].yumstate == "installed"  # installed|available
+  when: not ansible_check_mode
 
 #
 # Validar PostgreSQL
@@ -35,12 +37,14 @@
 - name: Validar PostgreSQL Server
   yum: list=postgresql-server
   register: old_postgresql_server
+  when: not ansible_check_mode
 
 - debug: var=old_postgresql_server.results[0].yumstate
+  when: not ansible_check_mode
 
 - name: Check PostgreSQL Server instalado?
   fail: msg="ATENÇÃO, PostgreSQL Server já instalado!!!"
-  when: old_postgresql_server.results[0].yumstate == "installed"  # installed|available
+  when: not ansible_check_mode and old_postgresql_server.results[0].yumstate == "installed"  # installed|available
 
 #- debug: var=old_postgresql_server.stdout
 
