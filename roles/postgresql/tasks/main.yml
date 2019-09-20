@@ -29,13 +29,13 @@
 # inspired by https://github.com/geerlingguy/ansible-role-postgresql/blob/master/tasks/initialize.yml
 - name: Check if PostgreSQL database is initialized.
   stat:
-    path: "/var/lib/pgsql/data/PG_VERSION"
-  register: pgdata_dir_version
+    path: /var/lib/pgsql/data/PG_VERSION
+  register: postgresql_dir_version
 
 # So tenta recriar a base de dados PostgreSQL no caso de nao ter sido criado
 - name: Iniciar base de dados do PostgreSQL
   shell: /usr/bin/postgresql-setup initdb
-  when: not pgdata_dir_version.stat.exists
+  when: not postgresql_dir_version.stat.exists
 
 - name: Restart PostgreSQL
   systemd:
