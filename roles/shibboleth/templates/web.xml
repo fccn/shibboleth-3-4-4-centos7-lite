@@ -157,6 +157,7 @@
         <servlet-name>shibboleth_jsp</servlet-name>
         <url-pattern>/shibboleth</url-pattern>
     </servlet-mapping>
+{% if idp_cmd_provision %}
     <servlet>
 		<servlet-name>CCExternalAuthHandler</servlet-name>
 		<servlet-class>CCExternalAuthServlet</servlet-class>
@@ -166,6 +167,7 @@
 		<servlet-name>CCExternalAuthHandler</servlet-name>
 		<url-pattern>/Authn/External/CC</url-pattern>
 	</servlet-mapping>
+{% endif %}
     <!-- Send servlet errors through the IdP's MVC error handling. -->
     <error-page>
         <exception-type>net.shibboleth.idp.authn.ExternalAuthenticationException</exception-type>

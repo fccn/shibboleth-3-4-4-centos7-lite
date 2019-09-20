@@ -40,10 +40,11 @@
     dest: /opt/shibboleth-idp/conf/authn/
     backup: yes
 
-- name: Copiar o ficheiro CCExternalAuthServlet.class
+- name: Copiar o web.xml
   copy:
     src: /opt/shibboleth-idp/dist/webapp/WEB-INF/web.xml
     dest: /opt/shibboleth-idp/edit-webapp/WEB-INF/
+    remote_src: yes
 
 #- name: Insertservlet and contxt-params in web.xml
 #  blockinfile:
@@ -81,6 +82,14 @@
     src: "{{ role_path }}/files/lib.zip"
     dest: /opt/shibboleth-idp/edit-webapp/WEB-INF/
 
+- name: Apagar ficheiros output cert.p12 e keystore para voltar a criar
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ keystore_location }}"
+    - cert.p12
+
 - name: Criar o certificado p12 
   expect:
     command: openssl pkcs12 -export -in {{ path_ssl_cc_cert_file }} -inkey {{ path_ssl_cc_cert_key_file }} -out cert.p12 -name {{ keystore_alias }} -CAfile {{ path_ssl_cc_cert_chain_file }}
@@ -90,13 +99,13 @@
       "Verifying.*": "{{ keystore_password }}"
     timeout: 30
     echo: yes
-  register: output_cmd
+    creates: cert.p12
 
 - name: Importar certificado para keystore
   shell: keytool -importkeystore  -deststorepass {{ keystore_password }} -destkeypass {{ keystore_password }} -destkeystore {{ keystore_location }} -srckeystore cert.p12 -srcstoretype PKCS12 -srcstorepass {{ keystore_password }} -alias {{ keystore_alias }}
-  register: shell_output
+  args:
+    creates: "{{ keystore_location }}"
 
 - name: Recriar o arquivo idp.war
   shell: JAVACMD=/usr/bin/java /opt/shibboleth-idp/bin/build.sh -Didp.target.dir=/opt/shibboleth-idp
-  register: shell_output
   notify: restart tomcat

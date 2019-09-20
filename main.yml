@@ -7,12 +7,12 @@
   become_method: sudo
 
   roles:
-#  - check-system
-#  - system
-#  - httpd
-#  - tomcat
-#  - postgresql
-#  - shibboleth
-#  - shibboleth_files
+  - check-system
+  - system
+  - httpd
+  - tomcat
+  - postgresql
+  - shibboleth
+  - shibboleth_files
   - cc-cmd
-#  - performance
+  - performance

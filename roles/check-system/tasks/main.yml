@@ -70,15 +70,21 @@
   fail: msg="ATENÇÃO, ficheiro {{ path_ssl_cert_file }} não encontrado!!"
   when: cert_file_exists.stat.exists == false
 
+
+# 
+# SSLCertificateChainFile became obsolete with version 2.4.8, when SSLCertificateFile was extended to also load intermediate CA certificates from the server certificate file
+# Reference: http://httpd.apache.org/docs/current/mod/mod_ssl.html#sslcertificatechainfile
+#
+# So path_ssl_cert_chain_file ansible variable has become an optional configuration instead of a required one.
 #
 # Validar a existencia da CA do Apache 
 ######################################################
-- name: Validar a existencia do CA
-  stat: path="{{ path_ssl_cert_chain_file }}"
-  register: cert_ca_exists
+# - name: Validar a existencia do CA
+#   stat: path="{{ path_ssl_cert_chain_file }}"
+#   register: cert_ca_exists
 
 # - debug: var=cert_ca_exists.stat.exists
 
-- name: Check existencia da "CA"
-  fail: msg="ATENÇÃO, ficheiro {{ path_ssl_cert_chain_file }} não encontrado!!"
-  when: cert_ca_exists.stat.exists == false
+# - name: Check existencia da "CA"
+#   fail: msg="ATENÇÃO, ficheiro {{ path_ssl_cert_chain_file }} não encontrado!!"
+#   when: cert_ca_exists.stat.exists == false

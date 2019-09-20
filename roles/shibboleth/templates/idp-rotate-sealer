@@ -1,1 +1,0 @@
-50 4 * * 0 tomcat /opt/shibboleth-idp/credentials/rotate-sealer.sh

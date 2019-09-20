@@ -144,7 +144,7 @@
     mode: 0644
     backup: yes
 
-- name: Copiar idp.custom.properties
+- name: Copiar idp-custom.properties
   template:
     src: idp-custom.properties
     dest: /opt/shibboleth-idp/conf/
@@ -310,11 +310,13 @@
   copy:
     src: /opt/shibboleth-idp/credentials/idp-signing.key
     dest: /opt/shibboleth-idp/credentials/idp.key
+    remote_src: yes
 
 - name: ficheiro idp.crt
   copy:
     src: /opt/shibboleth-idp/credentials/idp-signing.crt
     dest: /opt/shibboleth-idp/credentials/idp.crt
+    remote_src: yes
 
 - name: mover para pasta old os certificados nao utilizados - idp-signing.key
   command: mv /opt/shibboleth-idp/credentials/idp-signing.key /opt/shibboleth-idp/credentials/old/idp-signing.key

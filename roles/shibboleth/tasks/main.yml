@@ -101,13 +101,24 @@
     regexp: '<KeyDescriptor use="signing">'
     replace: '<KeyDescriptor>'
 
-- name: remover bloco Authority Attribute Descriptor na metadata
+- name: remover bloco Attribute Authority Descriptor na metadata se a versão do ansible >= 2.4
   replace:
     path: /opt/shibboleth-idp/metadata/idp-metadata.xml
     after: '</IDPSSODescriptor>'
     before: '</EntityDescriptor>'
     regexp: '^(.*?)$'
     replace: ' '
+  when: ansible_version.full is version_compare('2.4', '>=')
+
+- name: install xmlstarlet se a versão do ansible >= 2.4
+  package: 
+    name: xmlstarlet
+    state: present
+  when: ansible_version.full is version_compare('2.4', '<')
+
+- name: remover bloco Attribute Authority Descriptor na metadata se a versão do ansible < 2.4
+  command: xmlstarlet ed --inplace -N 'ns=urn:oasis:names:tc:SAML:2.0:metadata' -d '//ns:EntityDescriptor/ns:AttributeAuthorityDescriptor' /opt/shibboleth-idp/metadata/idp-metadata.xml
+  when: ansible_version.full is version_compare('2.4', '<')
 
 - name: remove linhas sem conteudo no ficheiro de metadata
   lineinfile:
@@ -116,8 +127,8 @@
     regexp: '^\s*$'
 
 - name: copiar web.xml
-  copy:
-    src: "{{ role_path }}/files/web.xml"
+  template:
+    src: "{{ role_path }}/templates/web.xml"
     dest: "/opt/shibboleth-idp/edit-webapp/WEB-INF/web.xml"
 
 - name: Recriar o arquivo idp.war

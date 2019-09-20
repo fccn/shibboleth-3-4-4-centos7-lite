@@ -1,0 +1,10 @@
+---
+idp_external_ccAttributes: 
+  - http://interop.gov.pt/MDC/Cidadao/Passport
+  - http://interop.gov.pt/MDC/Cidadao/Nacionalidade
+  - http://interop.gov.pt/MDC/Cidadao/NoDocumento
+  - http://interop.gov.pt/MDC/Cidadao/TipoDocumento
+
+idp_external_assertionURL: https://idp.fccn.pt/idp/Authn/External/CC
+
+idp_authn_flows: Password|CC
