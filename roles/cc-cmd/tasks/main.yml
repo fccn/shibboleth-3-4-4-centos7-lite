@@ -92,7 +92,7 @@
 
 - name: Criar o certificado p12 
   expect:
-    command: openssl pkcs12 -export -in {{ path_ssl_cc_cert_file }} -inkey {{ path_ssl_cc_cert_key_file }} -out cert.p12 -name {{ keystore_alias }} -CAfile {{ path_ssl_cc_cert_chain_file }}
+    command: openssl pkcs12 -export -in {{ path_ssl_cc_cert_file }} -inkey {{ path_ssl_cc_cert_key_file }} -out cert.p12 -name {{ keystore_alias }}{{ (' -CAfile ' + path_ssl_cc_cert_chain_file) if path_ssl_cc_cert_chain_file is defined else ''}}
     responses:
       "Enter pass.*": "{{ keystore_password }}"
       "Enter Export .*": "{{ keystore_password }}"
