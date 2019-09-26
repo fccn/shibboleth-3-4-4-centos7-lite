@@ -97,18 +97,19 @@
 
 - name: remover use signing no key descriptor da metadata (para usar o mesmo certificado para assinar e cifrar)
   replace:
-    path: /opt/shibboleth-idp/metadata/idp-metadata.xml
+    path: "{{ idp_metadata_path }}"
     regexp: '<KeyDescriptor use="signing">'
     replace: '<KeyDescriptor>'
+  when: idp_metadata_change_file
 
 - name: remover bloco Attribute Authority Descriptor na metadata se a versão do ansible >= 2.4
   replace:
-    path: /opt/shibboleth-idp/metadata/idp-metadata.xml
+    path: "{{ idp_metadata_path }}"
     after: '</IDPSSODescriptor>'
     before: '</EntityDescriptor>'
     regexp: '^(.*?)$'
     replace: ' '
-  when: ansible_version.full is version_compare('2.4', '>=')
+  when: idp_metadata_change_file and ansible_version.full is version_compare('2.4', '>=')
 
 - name: install xmlstarlet se a versão do ansible >= 2.4
   package: 
@@ -117,14 +118,15 @@
   when: ansible_version.full is version_compare('2.4', '<')
 
 - name: remover bloco Attribute Authority Descriptor na metadata se a versão do ansible < 2.4
-  command: xmlstarlet ed --inplace -N 'ns=urn:oasis:names:tc:SAML:2.0:metadata' -d '//ns:EntityDescriptor/ns:AttributeAuthorityDescriptor' /opt/shibboleth-idp/metadata/idp-metadata.xml
-  when: ansible_version.full is version_compare('2.4', '<')
+  command: xmlstarlet ed --inplace -N 'ns=urn:oasis:names:tc:SAML:2.0:metadata' -d '//ns:EntityDescriptor/ns:AttributeAuthorityDescriptor' {{ idp_metadata_path }}
+  when: idp_metadata_change_file and ansible_version.full is version_compare('2.4', '<')
 
 - name: remove linhas sem conteudo no ficheiro de metadata
   lineinfile:
-    path: /opt/shibboleth-idp/metadata/idp-metadata.xml
+    path: "{{ idp_metadata_path }}"
     state: absent
     regexp: '^\s*$'
+  when: idp_metadata_change_file
 
 - name: copiar web.xml
   template:

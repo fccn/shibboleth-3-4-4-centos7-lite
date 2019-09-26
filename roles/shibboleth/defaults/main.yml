@@ -1,2 +1,4 @@
 ---
 idp_cmd_provision: true
+idp_metadata_change_file: true
+idp_metadata_path: /opt/shibboleth-idp/metadata/idp-metadata.xml
