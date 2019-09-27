@@ -311,14 +311,14 @@
     src: /opt/shibboleth-idp/credentials/idp-signing.key
     dest: /opt/shibboleth-idp/credentials/idp.key
     remote_src: yes
-    creates: /opt/shibboleth-idp/credentials/idp.key
+    force: no # only copy if destination does not exist.
 
 - name: ficheiro idp.crt
   copy:
     src: /opt/shibboleth-idp/credentials/idp-signing.crt
     dest: /opt/shibboleth-idp/credentials/idp.crt
     remote_src: yes
-    creates: /opt/shibboleth-idp/credentials/idp.crt
+    force: no # only copy if destination does not exist.
 
 - name: mover para pasta old os certificados nao utilizados - idp-signing.key
   command: mv /opt/shibboleth-idp/credentials/idp-signing.key /opt/shibboleth-idp/credentials/old/idp-signing.key
