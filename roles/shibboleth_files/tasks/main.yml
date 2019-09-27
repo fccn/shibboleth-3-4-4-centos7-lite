@@ -306,29 +306,17 @@
     path: /opt/shibboleth-idp/credentials/old/
     state: directory
 
-- name: Check if idp.key exists
-  stat:
-    path: /opt/shibboleth-idp/credentials/idp.key
-  register: stat_idp_key
-
 - name: ficheiro idp.key 
   copy:
     src: /opt/shibboleth-idp/credentials/idp-signing.key
     dest: /opt/shibboleth-idp/credentials/idp.key
     remote_src: yes
-  when: not stat_idp_key.exists
-
-- name: Check if idp.crt exists
-  stat:
-    path: /opt/shibboleth-idp/credentials/idp.crt
-  register: stat_idp_crt
 
 - name: ficheiro idp.crt
   copy:
     src: /opt/shibboleth-idp/credentials/idp-signing.crt
     dest: /opt/shibboleth-idp/credentials/idp.crt
     remote_src: yes
-  when: not stat_idp_crt.exists
 
 - name: mover para pasta old os certificados nao utilizados - idp-signing.key
   command: mv /opt/shibboleth-idp/credentials/idp-signing.key /opt/shibboleth-idp/credentials/old/idp-signing.key
