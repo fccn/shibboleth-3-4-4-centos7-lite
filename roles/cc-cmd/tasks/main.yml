@@ -40,11 +40,11 @@
     dest: /opt/shibboleth-idp/conf/authn/
     backup: yes
 
-- name: Copiar o web.xml
-  copy:
-    src: /opt/shibboleth-idp/dist/webapp/WEB-INF/web.xml
-    dest: /opt/shibboleth-idp/edit-webapp/WEB-INF/
-    remote_src: yes
+# - name: Copiar o web.xml
+#   copy:
+#     src: /opt/shibboleth-idp/dist/webapp/WEB-INF/web.xml
+#     dest: /opt/shibboleth-idp/edit-webapp/WEB-INF/
+#     remote_src: yes
 
 #- name: Insertservlet and contxt-params in web.xml
 #  blockinfile:
