@@ -271,13 +271,12 @@
 #    mode: 0644
 
 
-#- name: Activar a visualização dos "Termos e Condições de Utilização" e o "User Consent"
-#  template:
-#    src: relying-party.xml
-#    dest: /opt/shibboleth-idp/conf/
-#    backup: yes
-#    mode: 0644
-
+- name: Activar a visualização dos "Termos e Condições de Utilização" e o "User Consent"
+  template:
+    src: relying-party.xml
+    dest: /opt/shibboleth-idp/conf/
+    backup: yes
+    mode: 0644
 
 #- name: Atualizar o consent-intercept-config
 #  template:
