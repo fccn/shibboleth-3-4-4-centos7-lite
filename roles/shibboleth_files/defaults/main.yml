@@ -8,3 +8,5 @@ idp_external_ccAttributes:
 idp_external_assertionURL: https://idp.fccn.pt/idp/Authn/External/CC
 
 idp_authn_flows: Password|CC
+
+relying_party_overrides: ''
