@@ -41,9 +41,9 @@
 - debug: var=old_postgresql_server.results[0].yumstate
   when: not ansible_check_mode
 
-- name: Check PostgreSQL Server instalado?
-  fail: msg="ATENÇÃO, PostgreSQL Server já instalado!!!"
-  when: not ansible_check_mode and old_postgresql_server.results[0].yumstate == "installed"  # installed|available
+# - name: Check PostgreSQL Server instalado?
+#   fail: msg="ATENÇÃO, PostgreSQL Server já instalado!!!"
+#   when: not ansible_check_mode and old_postgresql_server.results[0].yumstate == "installed"  # installed|available
 
 #- debug: var=old_postgresql_server.stdout
 
