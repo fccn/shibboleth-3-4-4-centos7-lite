@@ -45,7 +45,7 @@
   - dbus-glib
   - python-slip-dbus
   - dbus-python
-  - firewalld
+  # - firewalld
 
 - name: check for presence of SELinux config file
   stat: path=/etc/sysconfig/selinux
@@ -83,22 +83,22 @@
 # sudo firewall-cmd --zone=public --add-service=https --permanent
 # sudo firewall-cmd --reload
 
-- name: Allow all IPv4 traffic coming in on port 80 (http)
-  firewalld:
-    zone: public
-    service: http
-    permanent: true
-    state: enabled
+# - name: Allow all IPv4 traffic coming in on port 80 (http)
+#   firewalld:
+#     zone: public
+#     service: http
+#     permanent: true
+#     state: enabled
 
-- name: Allow all IPv4 traffic coming in on port 443 (https)
-  firewalld:
-    zone: public
-    service: https
-    permanent: true
-    state: enabled
+# - name: Allow all IPv4 traffic coming in on port 443 (https)
+#   firewalld:
+#     zone: public
+#     service: https
+#     permanent: true
+#     state: enabled
 
-- name: Carregar novas regras do iptables
-  systemd: name=firewalld state=restarted
+# - name: Carregar novas regras do iptables
+#   systemd: name=firewalld state=restarted
 
 - name: Recolher o melhor caminho para o java-1.8
   shell: ls -la /usr/lib/jvm/ | grep java-1.8.*x86_64/jre$ | tr -s [:space:] '#' | cut -d# -f11
