@@ -29,7 +29,6 @@
 ###############################################################
 - name: Mudar de owner
   file:
-    remote_src: yes
     dest: /opt/tomcat
     owner: tomcat
     group: tomcat
